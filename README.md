@@ -53,11 +53,3 @@ The directory structure of the project looks like this:
 Created using [mlops_template](https://github.com/SkafteNicki/mlops_template),
 a [cookiecutter template](https://github.com/cookiecutter/cookiecutter) for getting
 started with Machine Learning Operations (MLOps).
-
-
-Write a small project description
-A. Overall goal of the project
-B. What framework are you going to use and you do you intend to include the framework
-into your project?
-C. What data are you going to run on (initially, may change)
-D. What models do you expect to use
