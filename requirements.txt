@@ -3,3 +3,4 @@ typer==0.15.1
 fastapi==0.115.6
 uvicorn==0.34.0
 timm==1.0.13
+torchvision==0.17.2
