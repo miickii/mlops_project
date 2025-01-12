@@ -1,86 +1,53 @@
 import os
-from torchvision import datasets, transforms
 import torch
+from torchvision import datasets, transforms
+from PIL import Image
 
-def flatten_tensor(tensor):
-    return tensor.view(-1)
+# Function to process and save data
+def save_dataset_as_pt(data_dir, output_image_file, output_target_file):
+    image_tensors = []
+    targets = []
+    class_to_idx = {}
 
-def load_datasets(data_dir):
-    # Define paths for training and testing datasets
-    train_dir = os.path.join(data_dir, "Training")
-    test_dir = os.path.join(data_dir, "Test")
-    
-    # Define transformations: normalize and flatten the images
+    output_dir = "data/processed/"
+    os.makedirs(output_dir, exist_ok=True)
+
     transform = transforms.Compose([
-        transforms.ToTensor(),       # Convert PIL images to tensors
-        transforms.Normalize((0.5,), (0.5,)),  # Normalize to range [-1, 1]
-        transforms.Lambda(flatten_tensor)  # Flatten the tensor
-    ])
-    
-    # Load datasets from subfolders
-    train_set = datasets.ImageFolder(train_dir, transform=transform)
-    test_set = datasets.ImageFolder(test_dir, transform=transform)
-    
-    return train_set, test_set
-
-def save_datasets(train_set, test_set, processed_dir):
-    os.makedirs(processed_dir, exist_ok=True)  # Ensure the directory exists
-    train_path = os.path.join(processed_dir, "train_set.pt")
-    test_path = os.path.join(processed_dir, "test_set.pt")
-    
-    train_set.transform = None
-    test_set.transform = None
-
-
-    # Save the datasets
-    torch.save(train_set, train_path)
-    torch.save(test_set, test_path)
-
-    train_set.transform = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.5,), (0.5,)),
-        transforms.Lambda(flatten_tensor)
     ])
-    test_set.transform = train_set.transform
 
-    print(f"Train set saved to {train_path}")
-    print(f"Test set saved to {test_path}")
-
-def inspect_pt_file(file_path):
-    # Load the .pt file
-    data = torch.load(file_path)
-    
-    # Check the type of the object
-    print(f"Type of loaded object: {type(data)}")
-    
-    if isinstance(data, torch.utils.data.Dataset):
-        # For ImageFolder datasets
-        print(f"Number of samples: {len(data)}")
-        print(f"Classes: {data.classes}")
-        print(f"Class-to-Index Mapping: {data.class_to_idx}")
+    for class_name in sorted(os.listdir(data_dir)):
+        class_path = os.path.join(data_dir, class_name)
+        if not os.path.isdir(class_path):
+            continue
         
-        # Inspect a few samples
-        for i in range(500, 505):  # Show up to 3 samples
-            image, label = data[i]
-            print(f"Sample {i}:")
-            print(f"  Flattened Image Tensor: {image}")
-            print(f"  Label: {label}")
-    else:
-        print("The file does not contain a Dataset object.")
+        # Map class name to index
+        if not class_to_idx:
+            class_to_idx = {name: idx for idx, name in enumerate(sorted(os.listdir(data_dir)))}
+        
+        label = class_to_idx[class_name]
+        
+        # Process images
+        for image_name in os.listdir(class_path):
+            image_path = os.path.join(class_path, image_name)
+            image = Image.open(image_path).convert("RGB")  # Ensure RGB format
+            image_tensor = transform(image)
+            image_tensors.append(image_tensor)
+            targets.append(label)
+
+    # Save as .pt files
+    image_tensors = torch.stack(image_tensors)  # Stack all tensors into a single tensor
+    targets = torch.tensor(targets)  # Convert targets to a single tensor
+
+    torch.save(image_tensors, os.path.join(output_dir, output_image_file))
+    torch.save(targets, os.path.join(output_dir, output_target_file))
+    print(f"Saved {len(targets)} samples to {output_image_file} and {output_target_file}.")
 
 if __name__ == "__main__":
-    train_file_path = "data/processed/train_set.pt"
-    test_file_path = "data/processed/test_set.pt"
+    # Define paths
+    train_dir = "data/raw/fruits-360_dataset_100x100/fruits-360/Training"
+    test_dir = "data/raw/fruits-360_dataset_100x100/fruits-360/Test"
     
-    print("Inspecting Train Set:")
-    inspect_pt_file(train_file_path)
-    
-    print("\nInspecting Test Set:")
-    inspect_pt_file(test_file_path)
-
-# if __name__ == "__main__":
-#     data_dir = "data/raw/fruits-360_dataset_100x100/fruits-360"
-#     processed_dir = "data/processed"
-#     train_set, test_set = load_datasets(data_dir)
-    
-#     save_datasets(train_set, test_set, processed_dir)
+    # Process train and test datasets
+    save_dataset_as_pt(train_dir, "train_images.pt", "train_targets.pt")
+    save_dataset_as_pt(test_dir, "test_images.pt", "test_targets.pt")
