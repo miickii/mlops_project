@@ -1,6 +1,6 @@
-from torchvision import transforms
-import torch
 import os
+import torch
+from torchvision import datasets, transforms
 from PIL import Image
 
 # Function to process and save data
