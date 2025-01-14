@@ -9,7 +9,10 @@ repos:
     -   id: check-yaml
     -   id: check-added-large-files
     -   id: check-json
--   repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.286
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.7
     hooks:
     -   id: ruff
+        args: ["--fix"]  # Perform formatting updates
+    -   id: ruff
+        name: ruff-format  # Validate if all is fine with preview mode
