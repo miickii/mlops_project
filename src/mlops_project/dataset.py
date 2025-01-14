@@ -72,3 +72,16 @@ def get_dataloaders(batch_size=32, transform=None):
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     return train_loader, test_loader
+
+if __name__ == "__main__":
+    train_dataset, test_dataset = get_dataset()
+    print(f"Train dataset size: {len(train_dataset)}")
+    print(f"Test dataset size: {len(test_dataset)}")
+
+    x, y = train_dataset[0]  # Inspect the first sample
+    print(f"Image shape: {x.shape}")
+    #print(f"Label: {y}")
+
+    # train_targets = torch.unique(torch.tensor([train_dataset[i][1] for i in range(len(train_dataset))]))
+    # print(f"Train targets: {train_targets}")
+
