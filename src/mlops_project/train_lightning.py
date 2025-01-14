@@ -2,7 +2,7 @@ import torch
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
-from mlops_project.dataset import get_dataloaders
+from mlops_project.dataset import FruitsDataset
 from mlops_project.model import ProjectModel
 import typer
 from pytorch_lightning import LightningModule
@@ -38,7 +38,7 @@ def train(
     epochs: int = 4,
     batch_size: int = 32,
     lr: float = 1e-4,
-    model_name: str = "fruits_model.pth",
+    model_name: str = "fruits_model",
     project_name: str = "fruits_classification",
 ):
     """Train a fruit classification model with PyTorch Lightning."""
@@ -52,7 +52,9 @@ def train(
     wandb_logger = WandbLogger(project=project_name, log_model=True, reinit=True)
     print(f"Starting a new W&B run in project: {project_name}")
 
-    train_loader, _ = get_dataloaders(batch_size=batch_size, transform=None)
+    # Initialize dataset and DataLoader
+    train_dataset = FruitsDataset(data_folder="data/processed", train=True)
+    train_loader = train_dataset.get_dataloader(batch_size=batch_size)
 
     # Define model
     num_classes = 141

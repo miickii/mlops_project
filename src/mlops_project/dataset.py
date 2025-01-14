@@ -1,86 +1,78 @@
+from __future__ import annotations
+import os
+from typing import TYPE_CHECKING, Optional
 import torch
+from torch import Tensor
 from torch.utils.data import Dataset, DataLoader
+
+if TYPE_CHECKING:
+    import torchvision.transforms as transforms
+
 
 class FruitsDataset(Dataset):
     """
     Custom Dataset for loading preprocessed tensors with optional transformations.
-    """
-    def __init__(self, images, labels, transform=None):
-        """
-        Args:
-            images (Tensor): Tensor containing image data.
-            labels (Tensor): Tensor containing labels.
-            transform (callable, optional): Optional transform to apply to the images.
-        """
-        self.images = images
-        self.labels = labels
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.labels)
-
-    def __getitem__(self, idx):
-        image = self.images[idx]
-        label = self.labels[idx]
-
-        # Apply transformations, if any
-        if self.transform:
-            image = self.transform(image)
-
-        return image, label
-
-def get_dataset(transform=None):
-    train_image_file = "data/processed/train_images.pt"
-    train_target_file = "data/processed/train_targets.pt"
-    test_image_file = "data/processed/test_images.pt"
-    test_target_file = "data/processed/test_targets.pt"
-
-     # Load tensors
-    train_images = torch.load(train_image_file)
-    train_targets = torch.load(train_target_file)
-    test_images = torch.load(test_image_file)
-    test_targets = torch.load(test_target_file)
-
-    # Create datasets
-    train_dataset = FruitsDataset(train_images, train_targets, transform=transform)
-    test_dataset = FruitsDataset(test_images, test_targets, transform=transform)
-
-    return train_dataset, test_dataset
-
-
-
-def get_dataloaders(batch_size=32, transform=None):
-    """
-    Load preprocessed data and return DataLoaders for training and testing.
 
     Args:
-        train_image_file (str): Path to training images tensor (.pt file).
-        train_target_file (str): Path to training labels tensor (.pt file).
-        test_image_file (str): Path to testing images tensor (.pt file).
-        test_target_file (str): Path to testing labels tensor (.pt file).
-        batch_size (int): Batch size for DataLoader.
-        transform (callable, optional): Transform to apply to the images.
-
-    Returns:
-        tuple: Train and test DataLoaders.
+        data_folder: Path to the data folder containing tensors.
+        train: Whether to load training or test data.
+        img_transform: Image transformation to apply.
+        target_transform: Target transformation to apply.
     """
+    def __init__(
+        self,
+        data_folder: str = "data/processed",
+        train: bool = True,
+        img_transform: Optional[transforms.Compose] = None,
+        target_transform: Optional[transforms.Compose] = None,
+    ) -> None:
+        super().__init__()
+        self.data_folder = data_folder
+        self.train = train
+        self.img_transform = img_transform
+        self.target_transform = target_transform
+        self.load_data()
 
-    train_dataset, test_dataset = get_dataset(transform=transform)
+    def load_data(self) -> None:
+        """Load images and targets from disk."""
+        if self.train:
+            images_file = os.path.join(self.data_folder, "train_images.pt")
+            targets_file = os.path.join(self.data_folder, "train_targets.pt")
+        else:
+            images_file = os.path.join(self.data_folder, "test_images.pt")
+            targets_file = os.path.join(self.data_folder, "test_targets.pt")
 
-    # Create DataLoaders
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+        self.images = torch.load(images_file)
+        self.targets = torch.load(targets_file)
 
-    return train_loader, test_loader
+    def get_dataloader(self, batch_size=32, shuffle=True) -> DataLoader:
+        """Return DataLoader for the dataset."""
+        return DataLoader(self, batch_size=batch_size, shuffle=shuffle)
+
+
+    def __getitem__(self, idx: int) -> tuple[Tensor, Tensor]:
+        """Return image and target tensor."""
+        image, target = self.images[idx], self.targets[idx]
+        if self.img_transform:
+            image = self.img_transform(image)
+        if self.target_transform:
+            target = self.target_transform(target)
+        return image, target
+
+    def __len__(self) -> int:
+        """Return the number of samples in the dataset."""
+        return len(self.targets)
 
 if __name__ == "__main__":
-    train_dataset, test_dataset = get_dataset()
+    # Initialize datasets
+    train_dataset = FruitsDataset(data_folder="data/processed", train=True)
+    test_dataset = FruitsDataset(data_folder="data/processed", train=False)
+
+    # Print dataset sizes
     print(f"Train dataset size: {len(train_dataset)}")
     print(f"Test dataset size: {len(test_dataset)}")
 
-    x, y = train_dataset[0]  # Inspect the first sample
+    # Inspect the first sample
+    x, y = train_dataset[0]
     print(f"Image shape: {x.shape}")
-    #print(f"Label: {y}")
-
-    # train_targets = torch.unique(torch.tensor([train_dataset[i][1] for i in range(len(train_dataset))]))
-    # print(f"Train targets: {train_targets}")
+    print(f"Label: {y}")

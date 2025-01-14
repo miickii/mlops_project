@@ -3,7 +3,7 @@ import torch
 import typer
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-from mlops_project.dataset import get_dataloaders
+from mlops_project.dataset import FruitsDataset
 from mlops_project.model import ProjectModel
 from mlops_project.train_lightning import FruitClassifierModule
 
@@ -24,7 +24,9 @@ def visualize(model_checkpoint: str, figure_name: str = "embeddings.png", batch_
     """
     print("Starting visualization...")
 
-    _, test_loader = get_dataloaders(batch_size=batch_size, transform=None)
+    # Initialize test dataset and DataLoader
+    test_dataset = FruitsDataset(data_folder="data/processed", train=False)
+    test_loader = test_dataset.get_dataloader(batch_size=batch_size)
 
     # Check the file extension and load the model accordingly
     if model_checkpoint.endswith(".pth"):
@@ -40,8 +42,8 @@ def visualize(model_checkpoint: str, figure_name: str = "embeddings.png", batch_
         # Replace the final fully connected layer with an identity layer for embeddings
         model.fc = torch.nn.Identity()
 
-    elif model_checkpoint.endswith(".pth.ckpt"):
-        print("Loading model from .pth.ckpt Lightning checkpoint...")
+    elif model_checkpoint.endswith(".ckpt"):
+        print("Loading model from .ckpt Lightning checkpoint...")
         num_classes = 141
         model = FruitClassifierModule.load_from_checkpoint(
             model_checkpoint,

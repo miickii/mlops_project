@@ -1,4 +1,4 @@
-from mlops_project.dataset import get_dataloaders
+from mlops_project.dataset import FruitsDataset
 from mlops_project.model import ProjectModel
 from mlops_project.train_lightning import FruitClassifierModule
 import torch
@@ -11,9 +11,11 @@ app = typer.Typer()
 def evaluate(model_checkpoint: str, batch_size: int = 32) -> None:
     print("Starting evaluation...")
 
-    _, test_loader = get_dataloaders(batch_size=batch_size, transform=None)
+    # Initialize test dataset and DataLoader
+    test_dataset = FruitsDataset(data_folder="data/processed", train=False)
+    test_loader = test_dataset.get_dataloader(batch_size=batch_size)
 
-    # Check the file extension and load the model accordingly
+    # Load the model based on the checkpoint extension
     if model_checkpoint.endswith(".pth"):
         print("Loading model from .pth checkpoint...")
         num_classes = 141
@@ -21,13 +23,12 @@ def evaluate(model_checkpoint: str, batch_size: int = 32) -> None:
 
         # Load the saved model state_dict from the checkpoint
         checkpoint = torch.load(model_checkpoint, map_location=DEVICE)
-        model.load_state_dict(checkpoint['model_state_dict'])  # Correctly load the model parameters
+        model.load_state_dict(checkpoint['model_state_dict'])
         model.to(DEVICE)
 
-    elif model_checkpoint.endswith(".pth.ckpt"):
-        print("Loading model from .pth.ckpt Lightning checkpoint...")
+    elif model_checkpoint.endswith(".ckpt"):
+        print("Loading model from .ckpt Lightning checkpoint...")
         num_classes = 141
-        # Load the model from the Lightning checkpoint
         model = FruitClassifierModule.load_from_checkpoint(
             model_checkpoint,
             model=ProjectModel(num_classes=num_classes),
