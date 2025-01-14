@@ -4,6 +4,7 @@ from torch.utils.data import Dataset, DataLoader
 import timm
 from torch import nn, optim
 from tqdm import tqdm
+import typer
 
 # Define Custom Dataset for .pt Files
 class CustomDataset(Dataset):
@@ -64,63 +65,68 @@ model.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
-# Training loop
-epochs = 4
-for epoch in range(epochs):
-    model.train()
-    train_loss = 0
+def train():
+    print("Training model...")
+    # Training loop
+    epochs = 4
+    for epoch in range(epochs):
+        model.train()
+        train_loss = 0
+        correct = 0
+        total = 0
+
+        # Use tqdm to track progress
+        with tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}", unit="batch") as pbar:
+            for images, labels in pbar:
+                images, labels = images.to(device), labels.to(device)
+
+                # Forward pass
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+
+                # Backward pass
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+                # Metrics
+                train_loss += loss.item()
+                _, predicted = outputs.max(1)
+                total += labels.size(0)
+                correct += predicted.eq(labels).sum().item()
+
+                # Update progress bar
+                pbar.set_postfix({
+                    "loss": f"{train_loss / (total // labels.size(0)):.4f}",
+                    "accuracy": f"{100. * correct / total:.2f}%"
+                })
+
+        print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss/len(train_loader):.4f}, Accuracy: {100.*correct/total:.2f}%")
+
+    # Validate the model after training
+    model.eval()
+    test_loss = 0
     correct = 0
     total = 0
+    with tqdm(test_loader, desc="Validation", unit="batch") as pbar:
+        with torch.no_grad():
+            for images, labels in pbar:
+                images, labels = images.to(device), labels.to(device)
+                outputs = model(images)
+                loss = criterion(outputs, labels)
 
-    # Use tqdm to track progress
-    with tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}", unit="batch") as pbar:
-        for images, labels in pbar:
-            images, labels = images.to(device), labels.to(device)
+                test_loss += loss.item()
+                _, predicted = outputs.max(1)
+                total += labels.size(0)
+                correct += predicted.eq(labels).sum().item()
 
-            # Forward pass
-            outputs = model(images)
-            loss = criterion(outputs, labels)
+                # Update progress bar
+                pbar.set_postfix({
+                    "loss": f"{test_loss / (total // labels.size(0)):.4f}",
+                    "accuracy": f"{100. * correct / total:.2f}%"
+                })
 
-            # Backward pass
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+    print(f"Test Loss: {test_loss/len(test_loader):.4f}, Test Accuracy: {100.*correct/total:.2f}%")
 
-            # Metrics
-            train_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += labels.size(0)
-            correct += predicted.eq(labels).sum().item()
-
-            # Update progress bar
-            pbar.set_postfix({
-                "loss": f"{train_loss / (total // labels.size(0)):.4f}",
-                "accuracy": f"{100. * correct / total:.2f}%"
-            })
-
-    print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss/len(train_loader):.4f}, Accuracy: {100.*correct/total:.2f}%")
-
-# Validate the model after training
-model.eval()
-test_loss = 0
-correct = 0
-total = 0
-with tqdm(test_loader, desc="Validation", unit="batch") as pbar:
-    with torch.no_grad():
-        for images, labels in pbar:
-            images, labels = images.to(device), labels.to(device)
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-
-            test_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += labels.size(0)
-            correct += predicted.eq(labels).sum().item()
-
-            # Update progress bar
-            pbar.set_postfix({
-                "loss": f"{test_loss / (total // labels.size(0)):.4f}",
-                "accuracy": f"{100. * correct / total:.2f}%"
-            })
-
-print(f"Test Loss: {test_loss/len(test_loader):.4f}, Test Accuracy: {100.*correct/total:.2f}%")
+def main():
+    typer.run(train)
