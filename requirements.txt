@@ -6,3 +6,5 @@ timm==1.0.13
 torchvision==0.17.2
 pytorch-lightning==2.5.0.post0
 pillow==11.1.0
+numpy<2
+tqdm>=4.64.0

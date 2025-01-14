@@ -71,3 +71,33 @@ def build_docs(ctx: Context) -> None:
 def serve_docs(ctx: Context) -> None:
     """Serve documentation."""
     ctx.run("mkdocs serve --config-file docs/mkdocs.yaml", echo=True, pty=not WINDOWS)
+
+@task
+def git_push(ctx, message, branch='main'):
+    """
+    Perform git operations (add, commit, push) on a specified branch.
+    If the branch does not exist locally or remotely, it will be created.
+    After the operation, it will switch back to the original branch.
+    
+    Args:
+        message (str): The commit message.
+        branch (str): The branch to push to (default is 'main').
+    """
+    # Store the current branch to return to later
+    current_branch = ctx.run("git rev-parse --abbrev-ref HEAD", hide=True).stdout.strip()
+
+    # Fetch the latest branches from the remote (to ensure up-to-date remote references)
+    ctx.run("git fetch origin", hide=True)
+    
+    ctx.run(f"git checkout {branch}")
+    
+    # Add changes
+    ctx.run("git add .")
+    
+    # Commit changes
+    ctx.run(f"git commit -m '{message}'")
+    
+    # Push to specified branch
+    ctx.run(f"git push origin {branch}")
+    
+    ctx.run(f"git checkout {current_branch}")
