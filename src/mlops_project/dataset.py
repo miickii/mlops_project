@@ -29,8 +29,27 @@ class FruitsDataset(Dataset):
 
         return image, label
 
+def get_dataset(transform=None):
+    train_image_file = "data/processed/train_images.pt"
+    train_target_file = "data/processed/train_targets.pt"
+    test_image_file = "data/processed/test_images.pt"
+    test_target_file = "data/processed/test_targets.pt"
 
-def get_dataloaders(train_image_file, train_target_file, test_image_file, test_target_file, batch_size=32, transform=None):
+     # Load tensors
+    train_images = torch.load(train_image_file)
+    train_targets = torch.load(train_target_file)
+    test_images = torch.load(test_image_file)
+    test_targets = torch.load(test_target_file)
+
+    # Create datasets
+    train_dataset = FruitsDataset(train_images, train_targets, transform=transform)
+    test_dataset = FruitsDataset(test_images, test_targets, transform=transform)
+
+    return train_dataset, test_dataset
+
+
+
+def get_dataloaders(batch_size=32, transform=None):
     """
     Load preprocessed data and return DataLoaders for training and testing.
 
@@ -45,15 +64,8 @@ def get_dataloaders(train_image_file, train_target_file, test_image_file, test_t
     Returns:
         tuple: Train and test DataLoaders.
     """
-    # Load tensors
-    train_images = torch.load(train_image_file)
-    train_targets = torch.load(train_target_file)
-    test_images = torch.load(test_image_file)
-    test_targets = torch.load(test_target_file)
-
-    # Create datasets
-    train_dataset = FruitsDataset(train_images, train_targets, transform=transform)
-    test_dataset = FruitsDataset(test_images, test_targets, transform=transform)
+    
+    train_dataset, test_dataset = get_dataset(transform=transform)
 
     # Create DataLoaders
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)

@@ -54,14 +54,7 @@ def main():
 
     args = parser.parse_args()
 
-    train_image_file = "data/processed/train_images.pt"
-    train_target_file = "data/processed/train_targets.pt"
-    test_image_file = "data/processed/test_images.pt"
-    test_target_file = "data/processed/test_targets.pt"
-
-    train_loader, _ = get_dataloaders(
-        train_image_file, train_target_file, test_image_file, test_target_file, batch_size=args.batch_size, transform=None
-    )
+    train_loader, _ = get_dataloaders(batch_size=args.batch_size, transform=None)
 
     num_classes = 141
     model = ProjectModel(num_classes=num_classes)

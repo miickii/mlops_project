@@ -24,15 +24,7 @@ def visualize(model_checkpoint: str, figure_name: str = "embeddings.png", batch_
     """
     print("Starting visualization...")
 
-    # Load test data using get_dataloaders()
-    train_image_file = "data/processed/train_images.pt"
-    train_target_file = "data/processed/train_targets.pt"
-    test_image_file = "data/processed/test_images.pt"
-    test_target_file = "data/processed/test_targets.pt"
-
-    _, test_loader = get_dataloaders(
-        train_image_file, train_target_file, test_image_file, test_target_file, batch_size=batch_size, transform=None
-    )
+    _, test_loader = get_dataloaders(batch_size=batch_size, transform=None)
 
     # Check the file extension and load the model accordingly
     if model_checkpoint.endswith(".pth"):

@@ -52,15 +52,7 @@ def train(
     wandb_logger = WandbLogger(project=project_name, log_model=True, reinit=True)
     print(f"Starting a new W&B run in project: {project_name}")
 
-    # Data loaders
-    train_image_file = "data/processed/train_images.pt"
-    train_target_file = "data/processed/train_targets.pt"
-    test_image_file = "data/processed/test_images.pt"
-    test_target_file = "data/processed/test_targets.pt"
-
-    train_loader, _ = get_dataloaders(
-        train_image_file, train_target_file, test_image_file, test_target_file, batch_size=batch_size, transform=None
-    )
+    train_loader, _ = get_dataloaders(batch_size=batch_size, transform=None)
 
     # Define model
     num_classes = 141
