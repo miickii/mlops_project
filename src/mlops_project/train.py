@@ -1,126 +1,96 @@
-from torchvision import transforms
+from mlops_project.dataset import get_dataloaders
+from mlops_project.model import ProjectModel
 import torch
-from torch.utils.data import Dataset, DataLoader
-import timm
 from torch import nn, optim
 from tqdm import tqdm
+import os
+import argparse
 
-# Define Custom Dataset for .pt Files
-class CustomDataset(Dataset):
-    def __init__(self, images, labels, transform=None):
-        self.images = images
-        self.labels = labels
-        self.transform = transform
+def train_model(train_loader, model, criterion, optimizer, device, epochs=4, model_name="model.pth"):
+    for epoch in range(epochs):
+        model.train()
+        train_loss, correct, total = 0, 0, 0
 
-    def __len__(self):
-        return len(self.labels)
+        with tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}", unit="batch") as pbar:
+            for images, labels in pbar:
+                images, labels = images.to(device), labels.to(device)
 
-    def __getitem__(self, idx):
-        image = self.images[idx]
-        label = self.labels[idx]
+                outputs = model(images)
+                loss = criterion(outputs, labels)
 
-        # Apply transformations, if any
-        if self.transform:
-            image = self.transform(image)
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-        return image, label
+                train_loss += loss.item()
+                _, predicted = outputs.max(1)
+                total += labels.size(0)
+                correct += predicted.eq(labels).sum().item()
 
-# Load the .pt files
-train_images = torch.load("data/processed/train_images.pt")  # Training images tensor
-train_targets = torch.load("data/processed/train_targets.pt")  # Training labels tensor
+                pbar.set_postfix({
+                    "loss": f"{train_loss / total:.4f}",
+                    "accuracy": f"{100. * correct / total:.2f}%"
+                })
 
-test_images = torch.load("data/processed/test_images.pt")  # Test images tensor
-test_targets = torch.load("data/processed/test_targets.pt")  # Test labels tensor
+        print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss/len(train_loader):.4f}, Accuracy: {100.*correct/total:.2f}%")
+    
+    # Save the model
+    checkpoint_path = os.path.join("models/", model_name)
+    torch.save({
+        'epoch': epoch + 1,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': train_loss / len(train_loader),
+    }, checkpoint_path)
+    print(f"Model saved to {checkpoint_path}")
 
-# Define transformations
-train_transform = transforms.Compose([
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize only
-])
+# eksempel script: train --epochs 20 --batch_size 128
+def main():
+    parser = argparse.ArgumentParser(description="Train a fruit classification model.")
+    parser.add_argument("--epochs", type=int, default=4, help="Number of training epochs (default: 4)")
+    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training (default: 32)")
+    parser.add_argument("--lr", type=float, default=1e-4, help="Learning rate for optimizer (default: 1e-4)")
+    parser.add_argument("--model_name", type=str, default="model.pth", help="Filename for saving the trained model (default: model.pth)")
 
-test_transform = transforms.Compose([
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize only
-])
+    args = parser.parse_args()
 
-# Create datasets
-train_dataset = CustomDataset(train_images, train_targets, transform=train_transform)
-test_dataset = CustomDataset(test_images, test_targets, transform=test_transform)
+    train_image_file = "data/processed/train_images.pt"
+    train_target_file = "data/processed/train_targets.pt"
+    test_image_file = "data/processed/test_images.pt"
+    test_target_file = "data/processed/test_targets.pt"
 
-# Create data loaders
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+    train_loader, _ = get_dataloaders(
+        train_image_file, train_target_file, test_image_file, test_target_file, batch_size=args.batch_size, transform=None
+    )
 
-# Load pretrained ResNet
-model = timm.create_model("resnet18", pretrained=True)
+    num_classes = 141
+    model = ProjectModel(num_classes=num_classes)
+    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+    model.to(device)
 
-# Modify the final layer to match the number of classes in your dataset
-num_classes = 141  # Replace with your actual number of classes
-model.fc = nn.Linear(model.fc.in_features, num_classes)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
-# Move model to device
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
+    train_model(train_loader, model, criterion, optimizer, device, epochs=args.epochs, model_name=args.model_name)
 
-# Define loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
-# Training loop
-epochs = 4
-for epoch in range(epochs):
-    model.train()
-    train_loss = 0
-    correct = 0
-    total = 0
+if __name__ == "__main__":
+    train_image_file = "data/processed/train_images.pt"
+    train_target_file = "data/processed/train_targets.pt"
+    test_image_file = "data/processed/test_images.pt"
+    test_target_file = "data/processed/test_targets.pt"
 
-    # Use tqdm to track progress
-    with tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}", unit="batch") as pbar:
-        for images, labels in pbar:
-            images, labels = images.to(device), labels.to(device)
+    # No normalization transform since preprocessing already handled it
+    train_loader, test_loader = get_dataloaders(
+        train_image_file, train_target_file, test_image_file, test_target_file, batch_size=32, transform=None
+    )
 
-            # Forward pass
-            outputs = model(images)
-            loss = criterion(outputs, labels)
+    num_classes = 141
+    model = ProjectModel(num_classes=num_classes)
+    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+    model.to(device)
 
-            # Backward pass
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
-            # Metrics
-            train_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += labels.size(0)
-            correct += predicted.eq(labels).sum().item()
-
-            # Update progress bar
-            pbar.set_postfix({
-                "loss": f"{train_loss / (total // labels.size(0)):.4f}",
-                "accuracy": f"{100. * correct / total:.2f}%"
-            })
-
-    print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss/len(train_loader):.4f}, Accuracy: {100.*correct/total:.2f}%")
-
-# Validate the model after training
-model.eval()
-test_loss = 0
-correct = 0
-total = 0
-with tqdm(test_loader, desc="Validation", unit="batch") as pbar:
-    with torch.no_grad():
-        for images, labels in pbar:
-            images, labels = images.to(device), labels.to(device)
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-
-            test_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += labels.size(0)
-            correct += predicted.eq(labels).sum().item()
-
-            # Update progress bar
-            pbar.set_postfix({
-                "loss": f"{test_loss / (total // labels.size(0)):.4f}",
-                "accuracy": f"{100. * correct / total:.2f}%"
-            })
-
-print(f"Test Loss: {test_loss/len(test_loader):.4f}, Test Accuracy: {100.*correct/total:.2f}%")
+    train_model(train_loader, model, criterion, optimizer, device, epochs=4)

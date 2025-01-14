@@ -178,3 +178,4 @@ cython_debug/
 
 # Ignore Data file, as it is too large for git
 data/
+models/

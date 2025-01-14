@@ -1,58 +1,59 @@
+from mlops_project.dataset import get_dataloaders
+from mlops_project.model import ProjectModel
+from mlops_project.train_lightning import FruitClassifierModule
 import torch
-from torch.utils.data import DataLoader
-from torchvision import transforms
 import typer
-from model import ProjectModel  # Import your model definition
-from dataset import CustomDataset  # Import your dataset class
 
-# Set device for computation
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+app = typer.Typer()
 
-def evaluate(model_checkpoint: str, test_data_path: str, test_labels_path: str) -> None:
-    """
-    Evaluate a trained model on a test dataset.
-    
-    Args:
-        model_checkpoint (str): Path to the trained model checkpoint.
-        test_data_path (str): Path to the test images tensor (.pt file).
-        test_labels_path (str): Path to the test labels tensor (.pt file).
-    """
+@app.command()
+def evaluate(model_checkpoint: str, batch_size: int = 32) -> None:
     print("Starting evaluation...")
 
-    # Load the test dataset
-    print("Loading test data...")
-    test_images = torch.load(test_data_path)
-    test_targets = torch.load(test_labels_path)
+    train_image_file = "data/processed/train_images.pt"
+    train_target_file = "data/processed/train_targets.pt"
+    test_image_file = "data/processed/test_images.pt"
+    test_target_file = "data/processed/test_targets.pt"
 
-    # Define transformations
-    test_transform = transforms.Compose([
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
+    _, test_loader = get_dataloaders(
+        train_image_file, train_target_file, test_image_file, test_target_file, batch_size=batch_size, transform=None
+    )
 
-    # Create dataset and dataloader
-    test_dataset = CustomDataset(test_images, test_targets, transform=test_transform)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+    # Check the file extension and load the model accordingly
+    if model_checkpoint.endswith(".pth"):
+        print("Loading model from .pth checkpoint...")
+        num_classes = 141
+        model = ProjectModel(num_classes=num_classes)
 
-    # Load the model
-    print("Loading model...")
-    num_classes = 141  # Update with your actual number of classes
-    model = ProjectModel(num_classes=num_classes)
-    model.load_state_dict(torch.load(model_checkpoint))
-    model.to(DEVICE)
+        # Load the saved model state_dict from the checkpoint
+        checkpoint = torch.load(model_checkpoint, map_location=DEVICE)
+        model.load_state_dict(checkpoint['model_state_dict'])  # Correctly load the model parameters
+        model.to(DEVICE)
 
-    # Evaluate the model
+    elif model_checkpoint.endswith(".pth.ckpt"):
+        print("Loading model from .pth.ckpt Lightning checkpoint...")
+        num_classes = 141
+        # Load the model from the Lightning checkpoint
+        model = FruitClassifierModule.load_from_checkpoint(
+            model_checkpoint,
+            model=ProjectModel(num_classes=num_classes),
+            num_classes=num_classes,
+            lr=1e-4
+        )
+        model.to(DEVICE)
+
+    else:
+        raise ValueError("Unsupported checkpoint file extension. Please use .pth or .pth.ckpt files.")
+
     model.eval()
-    test_loss = 0
-    correct = 0
-    total = 0
+    test_loss, correct, total = 0, 0, 0
     criterion = torch.nn.CrossEntropyLoss()
 
     print("Evaluating model...")
     with torch.no_grad():
         for images, labels in test_loader:
             images, labels = images.to(DEVICE), labels.to(DEVICE)
-
-            # Forward pass
             outputs = model(images)
             loss = criterion(outputs, labels)
 
@@ -66,4 +67,4 @@ def evaluate(model_checkpoint: str, test_data_path: str, test_labels_path: str) 
     print(f"Test Accuracy: {accuracy:.2f}%")
 
 if __name__ == "__main__":
-    typer.run(evaluate)
+    app()

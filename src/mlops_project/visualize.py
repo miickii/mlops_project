@@ -3,36 +3,67 @@ import torch
 import typer
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-from dataset import CustomDataset  # Import your custom dataset
-from model import ProjectModel  # Import your model
+from mlops_project.dataset import get_dataloaders
+from mlops_project.model import ProjectModel
+from mlops_project.train_lightning import FruitClassifierModule
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
-def visualize(model_checkpoint: str, test_data_path: str, test_labels_path: str, figure_name: str = "embeddings.png") -> None:
+# Add Typer command
+app = typer.Typer()
+
+@app.command()
+def visualize(model_checkpoint: str, figure_name: str = "embeddings.png", batch_size: int = 32) -> None:
     """
     Visualize model embeddings using t-SNE.
 
     Args:
         model_checkpoint (str): Path to the trained model checkpoint.
-        test_data_path (str): Path to the test images tensor (.pt file).
-        test_labels_path (str): Path to the test labels tensor (.pt file).
         figure_name (str): Name of the output visualization file.
+        batch_size (int): Batch size for DataLoader.
     """
-    print("Loading model...")
-    num_classes = 141  # Update with your actual number of classes
-    model = ProjectModel(num_classes=num_classes)
-    model.load_state_dict(torch.load(model_checkpoint))
-    model.to(DEVICE)
+    print("Starting visualization...")
+
+    # Load test data using get_dataloaders()
+    train_image_file = "data/processed/train_images.pt"
+    train_target_file = "data/processed/train_targets.pt"
+    test_image_file = "data/processed/test_images.pt"
+    test_target_file = "data/processed/test_targets.pt"
+
+    _, test_loader = get_dataloaders(
+        train_image_file, train_target_file, test_image_file, test_target_file, batch_size=batch_size, transform=None
+    )
+
+    # Check the file extension and load the model accordingly
+    if model_checkpoint.endswith(".pth"):
+        print("Loading model from .pth checkpoint...")
+        num_classes = 141
+        model = ProjectModel(num_classes=num_classes)
+
+        # Load the saved model state_dict from the checkpoint
+        checkpoint = torch.load(model_checkpoint, map_location=DEVICE)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        model.to(DEVICE)
+
+        # Replace the final fully connected layer with an identity layer for embeddings
+        model.fc = torch.nn.Identity()
+
+    elif model_checkpoint.endswith(".pth.ckpt"):
+        print("Loading model from .pth.ckpt Lightning checkpoint...")
+        num_classes = 141
+        model = FruitClassifierModule.load_from_checkpoint(
+            model_checkpoint,
+            model=ProjectModel(num_classes=num_classes),
+            num_classes=num_classes,
+            lr=1e-4
+        )
+        model.model.fc = torch.nn.Identity()  # Replace the final layer with an identity layer for embeddings
+        model.to(DEVICE)
+
+    else:
+        raise ValueError("Unsupported checkpoint file extension. Please use .pth or .pth.ckpt files.")
+
     model.eval()
-
-    # Replace the fully connected layer with an identity layer to extract embeddings
-    model.fc = torch.nn.Identity()
-
-    print("Loading test data...")
-    test_images = torch.load(test_data_path)
-    test_targets = torch.load(test_labels_path)
-    test_dataset = CustomDataset(test_images, test_targets)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
 
     print("Extracting embeddings...")
     embeddings, targets = [], []
@@ -70,6 +101,6 @@ def visualize(model_checkpoint: str, test_data_path: str, test_labels_path: str,
     plt.savefig(f"reports/figures/{figure_name}")
     print(f"Visualization saved as {figure_name}")
 
+# visualize --figure-name embeddings_pth.png --batch-size 32 models/fruits_model.pth
 if __name__ == "__main__":
-    typer.run(visualize)
-    # Eksempel på kommando: python visualize.py "path/to/model_checkpoint.pth" "data/processed/test_images.pt" "data/processed/test_targets.pt" --figure-name="embedding_visualization.png"
+    app()
