@@ -78,7 +78,7 @@ def git_push(ctx, message, branch='main'):
     Perform git operations (add, commit, push) on a specified branch.
     If the branch does not exist locally or remotely, it will be created.
     After the operation, it will switch back to the original branch.
-    
+
     Args:
         message (str): The commit message.
         branch (str): The branch to push to (default is 'main').
@@ -88,16 +88,16 @@ def git_push(ctx, message, branch='main'):
 
     # Fetch the latest branches from the remote (to ensure up-to-date remote references)
     ctx.run("git fetch origin", hide=True)
-    
+
     ctx.run(f"git checkout {branch}", echo=True)
-    
+
     # Add changes
     ctx.run("git add .", echo=True)
-    
+
     # Commit changes
     ctx.run(f"git commit -m '{message}'", echo=True)
-    
+
     # Push to specified branch
     ctx.run(f"git push origin {branch}", echo=True)
-    
+
     ctx.run(f"git checkout {current_branch}", echo=True)

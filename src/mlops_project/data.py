@@ -27,7 +27,7 @@ def preprocess_and_save(data_dir: str, output_dir: str, output_image_file: str, 
         # Map class names to indices
         if not class_to_idx:
             class_to_idx = {name: idx for idx, name in enumerate(sorted(os.listdir(data_dir)))}
-        
+
         label = class_to_idx[class_name]
 
         # Process images

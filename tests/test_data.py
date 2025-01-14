@@ -25,4 +25,3 @@ def test_fruits_dataset():
 
     assert (train_targets == torch.arange(0, 141)).all(), "Train dataset does not contain all classes"
     assert (test_targets == torch.arange(0, 141)).all(), "Test dataset does not contain all classes"
-

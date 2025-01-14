@@ -64,7 +64,7 @@ def get_dataloaders(batch_size=32, transform=None):
     Returns:
         tuple: Train and test DataLoaders.
     """
-    
+
     train_dataset, test_dataset = get_dataset(transform=transform)
 
     # Create DataLoaders
@@ -84,4 +84,3 @@ if __name__ == "__main__":
 
     # train_targets = torch.unique(torch.tensor([train_dataset[i][1] for i in range(len(train_dataset))]))
     # print(f"Train targets: {train_targets}")
-

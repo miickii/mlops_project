@@ -33,7 +33,7 @@ def train_model(train_loader, model, criterion, optimizer, device, epochs=4, mod
                 })
 
         print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss/len(train_loader):.4f}, Accuracy: {100.*correct/total:.2f}%")
-    
+
     # Save the model
     checkpoint_path = os.path.join("models/", model_name)
     torch.save({

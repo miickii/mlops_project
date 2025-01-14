@@ -6,7 +6,7 @@ from torchinfo import summary
 def ProjectModel(num_classes, pretrained=True):
     """
     Create and configure the model.
-    
+
     Args:
         num_classes (int): Number of output classes.
         pretrained (bool): Whether to use a pretrained model.
