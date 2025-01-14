@@ -46,6 +46,7 @@ mkdocs-material==9.4.6
 mkdocs-material-extensions==1.3.1
 mkdocstrings==0.27.0
 mkdocstrings-python==1.12.2
+-e git+https://github.com/miickii/mlops_project.git@517d9e4388ecab9b8f4d6496d114733b82052476#egg=mlops_project
 mpmath==1.3.0
 multidict==6.1.0
 networkx==3.4.2
