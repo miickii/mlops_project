@@ -6,28 +6,38 @@ on:
   pull_request:
     branches: [ main, updated-code-structure ]
 
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
-        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        os: ["windows-latest", "macos-latest"]
+        python-version: ["3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.11
+        python-version: ${{ matrix.python-version }}
         cache: 'pip' # caching pip dependencies
+
+    - name: Set PYTHONPATH for Windows
+      if: runner.os == 'Windows'
+      run: echo "PYTHONPATH=$(pwd)/src" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8
+      shell: pwsh
+
+    - name: Set PYTHONPATH for Unix
+      if: runner.os != 'Windows'
+      run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+      shell: bash
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements_tests.txt
-    - name: Set PYTHONPATH
-      run: echo "PYTHONPATH=$PWD/src" >> $GITHUB_ENV
+
     - name: Test with pytest
       run: |
         pytest -v
