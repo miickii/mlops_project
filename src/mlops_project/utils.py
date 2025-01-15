@@ -1,4 +1,5 @@
-def show_images_with_labels(images, labels, save_path=None, show=True):
+import torch
+def show_images_with_labels(images: torch.Tensor, labels:torch.Tensor, save_path=None, show:bool = True):
     """
     Display a grid of images with their corresponding labels.
 
