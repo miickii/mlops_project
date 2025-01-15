@@ -28,9 +28,12 @@ dev = {file = ['requirements_dev.txt']}
 [tool.ruff]
 line-length = 120
 
+
 [tool.coverage.run]
 omit = ["tests/*"]
 
 [project.scripts]
 train = "mlops_project.train:main"
-evaluate = "mlops_project.evaluate:main"
+trainlightning = "mlops_project.train_lightning:app"
+evaluate = "mlops_project.evaluate:app"
+visualize = "mlops_project.visualize:app"

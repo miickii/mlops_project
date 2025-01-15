@@ -1,40 +1,43 @@
-name: Unit Tests
+name: "Run tests"
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, updated-code-structure ]
   pull_request:
-    branches:
-      - main
+    branches: [ main, updated-code-structure ]
 
 jobs:
-  test:
-    runs-on: ${{ matrix.operating-system }}
+  build:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        operating-system: ["ubuntu-latest", "windows-latest", "macos-latest"]
-        python-version: ["3.12", "3.11"]
+        os: ["windows-latest", "macos-latest"]
+        python-version: ["3.11", "3.12"]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip' # caching pip dependencies
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: setup.py
+    - name: Set PYTHONPATH for Windows
+      if: runner.os == 'Windows'
+      run: echo "PYTHONPATH=$(pwd)/src" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8
+      shell: pwsh
 
-      - name: Install dependencies
-        run: |
-          python -m pip install -U pip setuptools wheel
-          pip install -r requirements.txt
-          pip list
+    - name: Set PYTHONPATH for Unix
+      if: runner.os != 'Windows'
+      run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV
+      shell: bash
 
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements_tests.txt
 
-      - name: Run tests & coverage
-        run: |
-          coverage run -m pytest tests/
-          coverage report -m
+    - name: Test with pytest
+      run: |
+        pytest -v

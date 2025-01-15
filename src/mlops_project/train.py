@@ -1,70 +1,79 @@
-from torchvision import transforms
+from mlops_project.dataset import FruitsDataset
+from mlops_project.model import ProjectModel
 import torch
-from torch.utils.data import Dataset, DataLoader
-import timm
 from torch import nn, optim
 from tqdm import tqdm
-import typer
+import os
+import argparse
 
-# Define Custom Dataset for .pt Files
-class CustomDataset(Dataset):
-    def __init__(self, images, labels, transform=None):
-        self.images = images
-        self.labels = labels
-        self.transform = transform
+def train_model(train_loader, model, criterion, optimizer, device, epochs=4, model_name="model.pth"):
+    for epoch in range(epochs):
+        model.train()
+        train_loss, correct, total = 0, 0, 0
 
-    def __len__(self):
-        return len(self.labels)
+        with tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}", unit="batch") as pbar:
+            for images, labels in pbar:
+                images, labels = images.to(device), labels.to(device)
 
-    def __getitem__(self, idx):
-        image = self.images[idx]
-        label = self.labels[idx]
+                outputs = model(images)
+                loss = criterion(outputs, labels)
 
-        # Apply transformations, if any
-        if self.transform:
-            image = self.transform(image)
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-        return image, label
+                train_loss += loss.item()
+                _, predicted = outputs.max(1)
+                total += labels.size(0)
+                correct += predicted.eq(labels).sum().item()
 
-# Load the .pt files
-train_images = torch.load("data/processed/train_images.pt")  # Training images tensor
-train_targets = torch.load("data/processed/train_targets.pt")  # Training labels tensor
+                pbar.set_postfix({
+                    "loss": f"{train_loss / total:.4f}",
+                    "accuracy": f"{100. * correct / total:.2f}%"
+                })
 
-test_images = torch.load("data/processed/test_images.pt")  # Test images tensor
-test_targets = torch.load("data/processed/test_targets.pt")  # Test labels tensor
+        print(f"Epoch {epoch+1}/{epochs}, Loss: {train_loss/len(train_loader):.4f}, Accuracy: {100.*correct/total:.2f}%")
 
-# Define transformations
-train_transform = transforms.Compose([
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize only
-])
+    # Save the model
+    checkpoint_path = os.path.join("models/", model_name)
+    os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)  # Ensure the models directory exists
+    torch.save({
+        'epoch': epoch + 1,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': train_loss / len(train_loader),
+    }, checkpoint_path)
+    print(f"Model saved to {checkpoint_path}")
 
-test_transform = transforms.Compose([
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize only
-])
+# Example script: python train.py --epochs 20 --batch_size 128
+def main():
+    parser = argparse.ArgumentParser(description="Train a fruit classification model.")
+    parser.add_argument("--epochs", type=int, default=4, help="Number of training epochs (default: 4)")
+    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for training (default: 32)")
+    parser.add_argument("--lr", type=float, default=1e-4, help="Learning rate for optimizer (default: 1e-4)")
+    parser.add_argument("--model_name", type=str, default="model.pth", help="Filename for saving the trained model (default: model.pth)")
 
-# Create datasets
-train_dataset = CustomDataset(train_images, train_targets, transform=train_transform)
-test_dataset = CustomDataset(test_images, test_targets, transform=test_transform)
+    args = parser.parse_args()
 
-# Create data loaders
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+    # Initialize dataset and DataLoader
+    train_dataset = FruitsDataset(data_folder="data/processed", train=True)
+    train_loader = train_dataset.get_dataloader(batch_size=args.batch_size)
 
-# Load pretrained ResNet
-model = timm.create_model("resnet18", pretrained=True)
+    # Initialize model
+    num_classes = 141
+    model = ProjectModel(num_classes=num_classes)
+    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+    model.to(device)
 
-# Modify the final layer to match the number of classes in your dataset
-num_classes = 141  # Replace with your actual number of classes
-model.fc = nn.Linear(model.fc.in_features, num_classes)
+    # Define loss and optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
-# Move model to device
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
+    # Train the model
+    train_model(train_loader, model, criterion, optimizer, device, epochs=args.epochs, model_name=args.model_name)
 
-# Define loss and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
+<<<<<<< HEAD
 def train():
     print("Training model...")
     # Training loop
@@ -130,3 +139,7 @@ def train():
 
 def main():
     typer.run(train)
+=======
+if __name__ == "__main__":
+    main()
+>>>>>>> 816d2397c79530132338195073e7ddd68d3a127d

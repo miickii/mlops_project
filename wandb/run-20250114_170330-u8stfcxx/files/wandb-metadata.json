@@ -1,0 +1,42 @@
+{
+  "os": "macOS-15.2-arm64-arm-64bit",
+  "python": "CPython 3.11.11",
+  "startedAt": "2025-01-14T16:03:30.780001Z",
+  "program": "/opt/homebrew/Caskroom/miniconda/base/envs/MLOps/bin/train",
+  "git": {
+    "remote": "https://github.com/miickii/mlops_project.git",
+    "commit": "b8381e1786e543f0b30f80aa15419bc2d0b4b74e"
+  },
+  "email": "mickiharning@gmail.com",
+  "root": "/Users/micki/Documents/DTU/MLOps/mlops_project",
+  "host": "Mickis-MBP.home",
+  "executable": "/opt/homebrew/Caskroom/miniconda/base/envs/MLOps/bin/python",
+  "cpu_count": 10,
+  "cpu_count_logical": 10,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "87288311808"
+    },
+    "/System/Volumes/Data": {
+      "total": "494384795648",
+      "used": "87288311808"
+    }
+  },
+  "memory": {
+    "total": "17179869184"
+  },
+  "cpu": {
+    "count": 10,
+    "countLogical": 10
+  },
+  "apple": {
+    "name": "Apple M4",
+    "ecpuCores": 6,
+    "pcpuCores": 4,
+    "gpuCores": 10,
+    "memoryGb": 16,
+    "swapTotalBytes": "3221225472",
+    "ramTotalBytes": "17179869184"
+  }
+}
