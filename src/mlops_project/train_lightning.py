@@ -8,6 +8,8 @@ import typer
 from pytorch_lightning import LightningModule
 import wandb
 
+wandb.login(key="026b0ff3056cf33177e928f465c931ea5a2788bf")
+
 app = typer.Typer()
 
 class FruitClassifierModule(LightningModule):
@@ -31,7 +33,6 @@ class FruitClassifierModule(LightningModule):
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.model.parameters(), lr=self.lr)
-
 
 @app.command()
 def train(

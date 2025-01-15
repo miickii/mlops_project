@@ -46,21 +46,21 @@ def preprocess_and_save(data_dir: str, output_dir: str, output_image_file: str, 
     torch.save(targets, os.path.join(output_dir, output_target_file))
     print(f"Saved {len(targets)} samples to {output_image_file} and {output_target_file}.")
 
-def preprocess_data(raw_dir: str, output_dir: str) -> None:
+def preprocess_data() -> None:
     """Preprocess and save train and test datasets."""
     preprocess_and_save(
-        data_dir=os.path.join(raw_dir, "Training"),
-        output_dir=output_dir,
+        data_dir=os.path.join("data/raw/fruits-dataset_100x100", "Training"),
+        output_dir="data/processed",
         output_image_file="train_images.pt",
         output_target_file="train_targets.pt"
     )
     preprocess_and_save(
-        data_dir=os.path.join(raw_dir, "Test"),
-        output_dir=output_dir,
+        data_dir=os.path.join("data/raw/fruits-dataset_100x100", "Test"),
+        output_dir="data/processed",
         output_image_file="test_images.pt",
         output_target_file="test_targets.pt"
     )
 
-if __name__ == "__main__":
+def main():
     typer.run(preprocess_data)
-    # Eksempel på at process Training data: python src/mlops_project/data.py data/raw/fruits-dataset_100x100 data/processed
+    # Eksempel på at process Training data: python src/mlops_project/data.py
