@@ -3,10 +3,11 @@ from mlops_project.model import ProjectModel
 import torch
 from torch import nn, optim
 from tqdm import tqdm
+from torch.utils.data import DataLoader
 import os
 import argparse
 
-def train_model(train_loader, model, criterion, optimizer, device, epochs=4, model_name="model.pth"):
+def train_model(train_loader: DataLoader, model: nn.Module, criterion: nn.Module, optimizer: torch.optim.Optimizer, device: torch.device, epochs:int = 4, model_name:str ="model.pth"):
     for epoch in range(epochs):
         model.train()
         train_loss, correct, total = 0, 0, 0

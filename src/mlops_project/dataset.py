@@ -45,7 +45,7 @@ class FruitsDataset(Dataset):
         self.images = torch.load(images_file)
         self.targets = torch.load(targets_file)
 
-    def get_dataloader(self, batch_size=32, shuffle=True) -> DataLoader:
+    def get_dataloader(self, batch_size: int = 32, shuffle: bool = True) -> DataLoader:
         """Return DataLoader for the dataset."""
         return DataLoader(self, batch_size=batch_size, shuffle=shuffle)
 

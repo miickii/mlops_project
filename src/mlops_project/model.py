@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from torchinfo import summary
 
-def ProjectModel(num_classes, pretrained=True):
+def ProjectModel(num_classes: int, pretrained:bool = True):
     """
     Create and configure the model.
 
