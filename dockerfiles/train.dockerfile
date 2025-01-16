@@ -10,6 +10,7 @@ COPY requirements.txt requirements.txt
 COPY pyproject.toml pyproject.toml
 COPY src/ src/
 COPY data/ data/
+COPY .env .env
 
 WORKDIR /
 
