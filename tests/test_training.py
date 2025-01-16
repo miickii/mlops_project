@@ -4,7 +4,7 @@ from mlops_project.dataset import FruitsDataset
 from mlops_project.model import ProjectModel
 from mlops_project.train_lightning import FruitClassifierModule
 
-def test_training_pipeline():
+def test_training_pipeline(batch_size=32, lr=1e-3, epochs=1):
     """
     Test the training pipeline for initialization and integration.
 
