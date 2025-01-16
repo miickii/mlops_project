@@ -38,6 +38,7 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements_tests.txt
 
-    - name: Test with pytest
+    - name: Test with coverage
       run: |
-        pytest -v
+        coverage run -m pytest -v # Run tests with coverage measurement
+        coverage report

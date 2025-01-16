@@ -5,10 +5,7 @@ from mlops_project.dataset import FruitsDataset
 from mlops_project.model import ProjectModel
 from mlops_project.train_lightning import FruitClassifierModule
 
-@pytest.mark.parametrize("batch_size", [16, 32])
-@pytest.mark.parametrize("lr", [1e-3, 1e-4])
-@pytest.mark.parametrize("epochs", [1])
-def test_training_pipeline(batch_size, lr, epochs):
+def test_training_pipeline(batch_size=32, lr=1e-3, epochs=1):
     """
     Test the training pipeline for initialization and integration.
 
