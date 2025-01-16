@@ -104,4 +104,4 @@ virtualenv==20.28.1
 wandb==0.19.3
 watchdog==6.0.0
 yarl==1.18.3
-python-dotenv==1.01
+python-dotenv==1.0.1
