@@ -1,0 +1,50 @@
+name: Data Workflow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/**'
+      - '*.dvc'
+
+jobs:
+  data_statistics:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+        cache: 'pip'
+
+    - name: Install DVC
+      run: |
+        pip install dvc[all]
+        dvc version
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Pull data
+      run: dvc pull --no-run-cache
+      env:
+        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+
+    - name: Generate Data Statistics Report
+      run: |
+        python src/dataset_statistics.py > data_statistics.md
+
+    - name: Setup CML
+      uses: iterative/setup-cml@v2
+
+    - name: Comment on PR
+      env:
+        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        cml comment create data_statistics.md --watermark-title="Data Workflow"

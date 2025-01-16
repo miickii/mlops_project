@@ -9,7 +9,7 @@ RUN apt update && \
 COPY requirements.txt requirements.txt
 COPY pyproject.toml pyproject.toml
 COPY src/ src/
-COPY data/processed/ data/processed/
+COPY data/ data/
 COPY .env .env
 
 WORKDIR /
