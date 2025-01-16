@@ -7,8 +7,19 @@ from mlops_project.model import ProjectModel
 import typer
 from pytorch_lightning import LightningModule
 import wandb
+from dotenv import load_dotenv
+import os
 
-wandb.login(key="026b0ff3056cf33177e928f465c931ea5a2788bf")
+# Load environment variables from .env
+load_dotenv()
+
+# Get WandB API key from the environment variable
+wandb_api_key = os.getenv("WANDB_API_KEY")
+if wandb_api_key is None:
+    raise ValueError("WANDB_API_KEY not found in environment variables. Please set it in the .env file.")
+
+# Log in to WandB
+wandb.login(key=wandb_api_key)
 
 app = typer.Typer()
 
