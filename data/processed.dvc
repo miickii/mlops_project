@@ -1,6 +1,4 @@
 outs:
 - hash: md5
   path: processed
-  md5: d751713988987e9331980363e24189ce.dir
-  size: 0
-  nfiles: 0
+  files: []
