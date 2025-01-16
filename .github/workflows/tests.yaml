@@ -41,7 +41,6 @@ jobs:
 
     # Add DVC setup step
     - uses: iterative/setup-dvc@v1
-
     # Pull data using DVC
     - name: Get data
       run: dvc pull
