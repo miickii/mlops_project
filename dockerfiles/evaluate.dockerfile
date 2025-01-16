@@ -17,4 +17,4 @@ WORKDIR /
 RUN pip install -r requirements.txt --no-cache-dir --verbose
 RUN pip install . --no-deps --no-cache-dir --verbose
 
-ENTRYPOINT ["python", "-u", "src/mlops_project/train_lightning.py"]
+ENTRYPOINT ["python", "-u", "src/mlops_project/evaluate.py"]
