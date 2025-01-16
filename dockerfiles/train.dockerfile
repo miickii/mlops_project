@@ -11,6 +11,7 @@ COPY pyproject.toml pyproject.toml
 COPY src/ src/
 COPY .env .env
 COPY data/ data/
+COPY .env .env
 
 WORKDIR /
 

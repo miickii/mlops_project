@@ -16,6 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -38,6 +39,20 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements_tests.txt
 
+    # Add DVC setup step
+    - uses: iterative/setup-dvc@v1
+    # Pull data using DVC
+    - name: Get data
+      run: dvc pull
+      env:
+        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+
+    # Run tests with pytest
     - name: Test with pytest
+      run: pytest -v
+
+    # Run tests with coverage
+    - name: Test with coverage
       run: |
-        pytest -v
+        coverage run -m pytest -v # Run tests with coverage measurement
+        coverage report
