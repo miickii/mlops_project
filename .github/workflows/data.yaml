@@ -22,6 +22,11 @@ jobs:
         python-version: 3.11
         cache: 'pip'
 
+    - name: Install DVC
+      run: |
+        pip install dvc[all]
+        dvc version
+
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
