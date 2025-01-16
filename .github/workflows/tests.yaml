@@ -16,6 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -47,7 +48,11 @@ jobs:
       env:
         GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
 
+    # Run tests with pytest
     - name: Test with pytest
+      run: pytest -v
+
+    # Run tests with coverage
     - name: Test with coverage
       run: |
         coverage run -m pytest -v # Run tests with coverage measurement
