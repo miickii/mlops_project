@@ -177,7 +177,7 @@ cython_debug/
 #.idea/
 
 # Ignore Data file, as it is too large for git
-data/
+# data/
 models/
 lightning_logs/
 wandb/
