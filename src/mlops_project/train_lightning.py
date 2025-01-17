@@ -3,9 +3,8 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from mlops_project.dataset import FruitsDataset
-from mlops_project.model import ProjectModel
+from mlops_project.model_lightning import FruitClassifierModel
 import typer
-from pytorch_lightning import LightningModule
 import wandb
 from dotenv import load_dotenv
 import os
@@ -23,31 +22,9 @@ wandb.login(key=wandb_api_key)
 
 app = typer.Typer()
 
-class FruitClassifierModule(LightningModule):
-    def __init__(self, model, num_classes, lr):
-        super().__init__()
-        self.model = model
-        self.criterion = torch.nn.CrossEntropyLoss()
-        self.lr = lr
-
-    def forward(self, x):
-        return self.model(x)
-
-    def training_step(self, batch, batch_idx):
-        images, labels = batch
-        outputs = self.model(images)
-        loss = self.criterion(outputs, labels)
-        acc = (outputs.argmax(dim=1) == labels).float().mean()
-        self.log("train_loss", loss, on_epoch=True, prog_bar=True)
-        self.log("train_acc", acc, on_epoch=True, prog_bar=True)
-        return loss
-
-    def configure_optimizers(self):
-        return torch.optim.Adam(self.model.parameters(), lr=self.lr)
-
 @app.command()
 def train(
-    epochs: int = 4,
+    epochs: int = 1,
     batch_size: int = 32,
     lr: float = 1e-4,
     model_name: str = "fruits_model",
@@ -69,9 +46,9 @@ def train(
     train_loader = train_dataset.get_dataloader(batch_size=batch_size)
 
     # Define model
-    num_classes = 141
-    base_model = ProjectModel(num_classes=num_classes)
-    model = FruitClassifierModule(base_model, num_classes, lr)
+    model = FruitClassifierModel(lr)
+    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+    model.to(device)
 
     # Callbacks
     checkpoint_callback = ModelCheckpoint(
