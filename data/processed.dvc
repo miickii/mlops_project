@@ -1,3 +1,6 @@
 outs:
-- hash: md5
+- md5: cdf9ca6bcf5de71e49392160bb816027.dir
+  size: 755247
+  nfiles: 2
+  hash: md5
   path: processed
