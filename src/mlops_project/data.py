@@ -49,13 +49,13 @@ def preprocess_and_save(data_dir: str, output_dir: str, output_image_file: str, 
 def preprocess_data() -> None:
     """Preprocess and save train and test datasets."""
     preprocess_and_save(
-        data_dir=os.path.join("data/raw/fruits-dataset_100x100", "Training"),
+        data_dir=os.path.join("data/raw/fruits-dataset-100x100", "Training"),
         output_dir="data/processed",
         output_image_file="train_images.pt",
         output_target_file="train_targets.pt"
     )
     preprocess_and_save(
-        data_dir=os.path.join("data/raw/fruits-dataset_100x100", "Test"),
+        data_dir=os.path.join("data/raw/fruits-dataset-100x100", "Test"),
         output_dir="data/processed",
         output_image_file="test_images.pt",
         output_target_file="test_targets.pt"

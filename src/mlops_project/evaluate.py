@@ -1,6 +1,6 @@
 from mlops_project.dataset import FruitsDataset
 from mlops_project.model import ProjectModel
-from mlops_project.train_lightning import FruitClassifierModule
+from mlops_project.model_lightning import FruitClassifierModel
 import torch
 import typer
 
@@ -29,13 +29,10 @@ def evaluate(model_checkpoint: str, batch_size: int = 32) -> None:
     elif model_checkpoint.endswith(".ckpt"):
         print("Loading model from .ckpt Lightning checkpoint...")
         num_classes = 141
-        model = FruitClassifierModule.load_from_checkpoint(
+        model = FruitClassifierModel.load_from_checkpoint(
             model_checkpoint,
-            model=ProjectModel(num_classes=num_classes),
-            num_classes=num_classes,
             lr=1e-4
         )
-        model.to(DEVICE)
 
     else:
         raise ValueError("Unsupported checkpoint file extension. Please use .pth or .pth.ckpt files.")

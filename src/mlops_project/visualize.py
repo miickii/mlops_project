@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from mlops_project.dataset import FruitsDataset
 from mlops_project.model import ProjectModel
-from mlops_project.train_lightning import FruitClassifierModule
+from mlops_project.model_lightning import FruitClassifierModel
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
@@ -45,12 +45,14 @@ def visualize(model_checkpoint: str, figure_name: str = "embeddings.png", batch_
     elif model_checkpoint.endswith(".ckpt"):
         print("Loading model from .ckpt Lightning checkpoint...")
         num_classes = 141
-        model = FruitClassifierModule.load_from_checkpoint(
-            model_checkpoint,
-            model=ProjectModel(num_classes=num_classes),
-            num_classes=num_classes,
-            lr=1e-4
-        )
+        model = FruitClassifierModel.load_from_checkpoint(model_checkpoint, lr=1e-4)
+       #model.load_from_checkpoint(model_checkpoint)
+        # FruitClassifierModel.load_from_checkpoint(
+        #     model_checkpoint,
+        #     model=ProjectModel(num_classes=num_classes),
+        #     num_classes=num_classes,
+        #     lr=1e-4
+        # )
         model.model.fc = torch.nn.Identity()  # Replace the final layer with an identity layer for embeddings
         model.to(DEVICE)
 
