@@ -65,5 +65,6 @@ def train(
     trainer.fit(model, train_loader)
 
 
+
 if __name__ == "__main__":
     app()

@@ -1,0 +1,12 @@
+# Inkluder specifikke filer og mapper
+!requirements.txt
+!pyproject.toml
+!src/
+!data/
+!.env
+
+# Ekskluder generelle irrelevante filer
+.git
+.gitignore
+__pycache__/
+*.pyc
