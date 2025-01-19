@@ -1,6 +1,21 @@
 outs:
-- md5: cdf9ca6bcf5de71e49392160bb816027.dir
-  size: 755247
-  nfiles: 2
-  hash: md5
+- hash: md5
   path: processed
+  files:
+  - relpath: test_images.pt
+    md5: 40b5a1dd3c2ce7c48ecddb155607fb26
+    size: 2834281200
+  - relpath: test_targets.pt
+    md5: 89c6c436d4b22169531e2dbc4cc9acf9
+    size: 190133
+    cloud:
+      gcs_remote:
+        etag: 08829fcbd980fd8a031001
+        version_id: '1737125480550274'
+  - relpath: train_targets.pt
+    md5: 6974cbb89558ab22d2668cf685066982
+    size: 565114
+    cloud:
+      gcs_remote:
+        etag: 088691bed980fd8a031001
+        version_id: '1737125480335494'
