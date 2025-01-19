@@ -181,4 +181,3 @@ models/
 lightning_logs/
 wandb/
 reports/figures
-data/processed.dvc

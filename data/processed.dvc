@@ -1,6 +1,32 @@
 outs:
-- md5: 45dd00460b9633321e99c7246a2da0d0.dir
-  size: 5644461012
-  nfiles: 4
-  hash: md5
+- hash: md5
   path: processed
+  files:
+  - relpath: test_images.pt
+    md5: b0b05d7b49b5c24e3b0ea2b98c477904
+    size: 1415881200
+    cloud:
+      storage:
+        etag: 08a2cdc8d3cd828b031001
+        version_id: '1737317936146082'
+  - relpath: test_targets.pt
+    md5: 4f3a3a4f96e6f31abde450ffa70feda6
+    size: 95541
+    cloud:
+      storage:
+        etag: 08c3adcf9ecd828b031001
+        version_id: '1737317825107651'
+  - relpath: train_images.pt
+    md5: daea2068409329faa2b050a992c9661b
+    size: 4228201205
+    cloud:
+      storage:
+        etag: 08fd80b59ecd828b031001
+        version_id: '1737317824675965'
+  - relpath: train_targets.pt
+    md5: e1affb7f3cd62b14e45725a0e64a6cd2
+    size: 283066
+    cloud:
+      storage:
+        etag: 08ebe4c59ecd828b031001
+        version_id: '1737317824950891'

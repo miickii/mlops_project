@@ -16,6 +16,7 @@ def test_fruits_dataset(train):
     # Check dataset size
     expected_size = EXPECTED_TRAIN_SIZE if train else EXPECTED_TEST_SIZE
     assert len(dataset) == expected_size, f"Dataset size mismatch for {'train' if train else 'test'}"
+    print(len(dataset))
 
     # Test individual samples (limit to first 10 for efficiency)
     for i in range(min(10, len(dataset))):

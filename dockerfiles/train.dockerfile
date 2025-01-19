@@ -11,10 +11,6 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 COPY pyproject.toml pyproject.toml
 COPY src/ src/
-<<<<<<< HEAD
-=======
-COPY .env .env
->>>>>>> 57d3e324acea00a6cc3ff83a983adca7070aab6d
 COPY data/ data/
 
 # Install Python packages
