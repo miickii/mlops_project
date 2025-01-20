@@ -47,8 +47,12 @@ jobs:
 
 
     # Pull data using DVC
-    - name: Get data
+    # Set up DVC
+    - name: Set up DVC
       uses: iterative/setup-dvc@v1
+
+    # Pull data using DVC
+    - name: Pull data
       run: dvc pull
 
     # Run tests with coverage
