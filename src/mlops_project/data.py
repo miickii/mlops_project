@@ -3,6 +3,7 @@ import torch
 from torchvision import transforms
 from PIL import Image
 import typer
+import random
 
 def preprocess_and_save(data_dir: str, output_dir: str, output_image_file: str, output_target_file: str) -> None:
     """Preprocess dataset (ToTensor and Normalize) and save as .pt files."""
@@ -30,8 +31,16 @@ def preprocess_and_save(data_dir: str, output_dir: str, output_image_file: str, 
 
         label = class_to_idx[class_name]
 
-        # Process images
-        for image_name in os.listdir(class_path):
+        # Get all images in the class
+        image_names = sorted(os.listdir(class_path))
+        random.shuffle(image_names)  # Shuffle to ensure randomness
+
+        # Use only half the images
+        num_images = len(image_names) // 2
+        selected_images = image_names[:num_images]
+
+        # Process selected images
+        for image_name in selected_images:
             image_path = os.path.join(class_path, image_name)
             image = Image.open(image_path).convert("RGB")  # Ensure RGB format
             image_tensor = transform(image)
