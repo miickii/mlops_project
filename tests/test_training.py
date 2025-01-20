@@ -32,7 +32,7 @@ def test_training_pipeline(batch_size=32, lr=1e-3, epochs=1):
     model = FruitClassifierModel(1e-3)
 
     # Initialize trainer with dynamic batch limit
-    trainer = Trainer(max_epochs=1, limit_train_batches=dynamic_limit)
+    trainer = Trainer(max_epochs=1, limit_train_batches=dynamic_limit, devices="cpu")
     assert isinstance(trainer, Trainer), "Trainer is not an instance of pytorch_lightning.Trainer"
 
     # Run a sanity check to ensure the training loop initializes correctly
