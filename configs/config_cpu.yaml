@@ -4,7 +4,7 @@ workerPoolSpecs:
         machineType: n1-highmem-2
     replicaCount: 1
     containerSpec:
-        imageUri: gcr.io/dtumlops-447821/train:latest
+        imageUri: europe-west1-docker.pkg.dev/dtumlops-447821/fruits-project-docker/train
         env:
         - name: WANDB_API_KEY
           value: 026b0ff3056cf33177e928f465c931ea5a2788bf
