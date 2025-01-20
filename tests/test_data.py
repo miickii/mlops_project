@@ -3,8 +3,8 @@ import pytest
 from mlops_project.dataset import FruitsDataset
 
 # Define expected dataset sizes
-EXPECTED_TRAIN_SIZE = 70491
-EXPECTED_TEST_SIZE = 23619
+EXPECTED_TRAIN_SIZE = 35235
+EXPECTED_TEST_SIZE = 11799
 NUM_CLASSES = 141
 
 
@@ -16,7 +16,6 @@ def test_fruits_dataset(train):
     # Check dataset size
     expected_size = EXPECTED_TRAIN_SIZE if train else EXPECTED_TEST_SIZE
     assert len(dataset) == expected_size, f"Dataset size mismatch for {'train' if train else 'test'}"
-    print(len(dataset))
 
     # Test individual samples (limit to first 10 for efficiency)
     for i in range(min(10, len(dataset))):

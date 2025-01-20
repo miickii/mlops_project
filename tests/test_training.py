@@ -1,8 +1,7 @@
 import torch
 from pytorch_lightning import Trainer
 from mlops_project.dataset import FruitsDataset
-from mlops_project.model import ProjectModel
-from mlops_project.train_lightning import FruitClassifierModule
+from mlops_project.train_lightning import FruitClassifierModel
 
 def test_training_pipeline(batch_size=32, lr=1e-3, epochs=1):
     """
@@ -30,9 +29,7 @@ def test_training_pipeline(batch_size=32, lr=1e-3, epochs=1):
     dynamic_limit = min(1.0, max(1 / total_batches, 1.0 / total_batches)) if total_batches > 0 else 1.0
 
     # Initialize model and module
-    num_classes = 141
-    base_model = ProjectModel(num_classes=num_classes)
-    model = FruitClassifierModule(base_model, num_classes, 1e-3)
+    model = FruitClassifierModel(1e-3)
 
     # Initialize trainer with dynamic batch limit
     trainer = Trainer(max_epochs=1, limit_train_batches=dynamic_limit)

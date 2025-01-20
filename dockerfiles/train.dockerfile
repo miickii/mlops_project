@@ -11,7 +11,7 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 COPY pyproject.toml pyproject.toml
 COPY src/ src/
-COPY data/ data/
+COPY data/processed/ data/processed/
 
 # Install Python packages
 RUN pip install -r requirements.txt --no-cache-dir --verbose
