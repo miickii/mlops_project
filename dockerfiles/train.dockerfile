@@ -8,6 +8,7 @@ RUN apt update && \
 
 # Copy necessary files
 WORKDIR /app
+
 COPY requirements.txt requirements.txt
 COPY pyproject.toml pyproject.toml
 COPY src/ src/

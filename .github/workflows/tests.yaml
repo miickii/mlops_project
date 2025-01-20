@@ -39,17 +39,17 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements_tests.txt
 
-    # Add DVC setup step
-    - uses: iterative/setup-dvc@v1
+    # Auth with GCP
+    - name: Auth with GCP
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+
     # Pull data using DVC
     - name: Get data
+      uses: iterative/setup-dvc@v1
       run: dvc pull
-      env:
-        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
-
-    # Run tests with pytest
-    - name: Test with pytest
-      run: pytest -v
 
     # Run tests with coverage
     - name: Test with coverage
