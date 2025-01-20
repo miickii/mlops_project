@@ -181,8 +181,4 @@ models/
 lightning_logs/
 wandb/
 reports/figures
-<<<<<<< HEAD
 cloudbuild.yaml
-=======
-cloudbuild.yaml
->>>>>>> 3cb7fb639a07a5d8f2dda370ec3df5d403bf0d21
