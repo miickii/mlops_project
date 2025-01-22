@@ -326,7 +326,7 @@ We used the WANDB (Weights and Biases) framework to run our experiments, since i
 
 Following are three screenshots that show training metrics from a machine learning experiment.
 
-![Training Loss per Step](figures/train_loss.png)
+![Training Loss per Step](figures/train_loss_step.png)
 
 The first image displays training loss per step, dropping significantly from 4.0 to nearly 0 over 8,000 steps. The sharp initial decline followed by stabilization indicates good model convergence.
 
