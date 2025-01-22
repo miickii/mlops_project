@@ -71,7 +71,7 @@ pydantic_core==2.27.2
 Pygments==2.19.1
 pymdown-extensions==10.14
 pyparsing==3.2.1
-pytest==7.4.3
+pytest==8.3.4
 python-dateutil==2.9.0.post0
 pytorch-lightning==2.5.0.post0
 PyYAML==6.0.2
