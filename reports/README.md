@@ -67,13 +67,13 @@ will check the repositories and the code to verify your answers.
     are using (M2+M6)
 * [x] Remember to comply with good coding practices (`pep8`) while doing the project (M7)
 * [x] Do a bit of code typing and remember to document essential parts of your code (M7)
-* [ ] Setup version control for your data or part of your data (M8)
+* [x] Setup version control for your data or part of your data (M8)
 * [x] Add command line interfaces and project commands to your code where it makes sense (M9)
 * [x] Construct one or multiple docker files for your code (M10)
 * [x] Build the docker files locally and make sure they work as intended (M10)
 * [-] Write one or multiple configurations files for your experiments (M11)
 * [-] Used Hydra to load the configurations and manage your hyperparameters (M11)
-* [ ] Use profiling to optimize your code (M12)
+* [-] Use profiling to optimize your code (M12)
 * [x] Use logging to log important events in your code (M14)
 * [x] Use Weights & Biases to log training progress and other important metrics/artifacts in your code (M14)
 * [?] Consider running a hyperparameter optimization sweep (M14)
@@ -86,19 +86,19 @@ will check the repositories and the code to verify your answers.
 * [x] Calculate the code coverage (M16)
 * [x] Get some continuous integration running on the GitHub repository (M17)
 * [x] Add caching and multi-os/python/pytorch testing to your continuous integration (M17)
-* [ ] Add a linting step to your continuous integration (M17)
+* [x] Add a linting step to your continuous integration (M17)
 * [x] Add pre-commit hooks to your version control setup (M18)
-* [ ] Add a continues workflow that triggers when data changes (M19)
-* [ ] Add a continues workflow that triggers when changes to the model registry is made (M19)
-* [ ] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
-* [ ] Create a trigger workflow for automatically building your docker images (M21)
-* [ ] Get your model training in GCP using either the Engine or Vertex AI (M21)
+* [-] Add a continues workflow that triggers when data changes (M19)
+* [-] Add a continues workflow that triggers when changes to the model registry is made (M19)
+* [x] Create a data storage in GCP Bucket for your data and link this with your data version control setup (M21)
+* [-] Create a trigger workflow for automatically building your docker images (M21)
+* [x] Get your model training in GCP using either the Engine or Vertex AI (M21)
 * [x] Create a FastAPI application that can do inference using your model (M22)
-* [ ] Deploy your model in GCP using either Functions or Run as the backend (M23)
-* [ ] Write API tests for your application and setup continues integration for these (M24)
-* [ ] Load test your application (M24)
-* [ ] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
-* [ ] Create a frontend for your API (M26)
+* [x] Deploy your model in GCP using either Functions or Run as the backend (M23)
+* [x] Write API tests for your application and setup continues integration for these (M24)
+* [-] Load test your application (M24)
+* [-] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
+* [-] Create a frontend for your API (M26)
 
 ### Week 3
 
@@ -131,10 +131,6 @@ will check the repositories and the code to verify your answers.
 
 ### Question 2
 > **Enter the study number for each member in the group**
->
-> Example:
->
-> *sXXXXXX, sXXXXXX, sXXXXXX*
 >
 > Answer:
 
@@ -261,15 +257,13 @@ Although we did not use pull requests regularly, we recognize their importance i
 > **Did you use DVC for managing data in your project? If yes, then how did it improve your project to have version**
 > **control of your data. If no, explain a case where it would be beneficial to have version control of your data.**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *We did make use of DVC in the following way: ... . In the end it helped us in ... for controlling ... part of our*
-> *pipeline*
->
 > Answer:
 
---- question 10 fill here ---
+To ensure consistency in working with the same raw and processed data, we utilized Data Version Control (DVC). One of the primary reasons for adopting DVC was the significant size of our dataset, which consisted of images. The dataset was too large to be pushed to GitHub, creating challenges when incorporating GitHub Actions. Additionally, the size made the training and Docker image-building processes much more tedious.
+
+To address these issues, we decided to reduce our dataset by removing half the images from each class. This made DVC crucial, as one team member manually trimmed the data. Without DVC, any mistakes or accidental deletions could have permanently lost the modified dataset.
+
+Initially, we attempted to use Google Drive with DVC but faced issues due to changes in Google Drive's API policy. As a solution, we switched to using a Google Cloud Storage bucket, where the process was significantly smoother. Using DVC, we uploaded the trimmed dataset to a shared public bucket, enabling all team members to pull the same data. This approach ensured consistency, facilitated integration with GitHub Actions, and improved our workflow by streamlining access to the dataset.
 
 ### Question 11
 
@@ -318,62 +312,77 @@ This command specifies the number of epochs, batch size, learning rate, and mode
 > **Reproducibility of experiments are important. Related to the last question, how did you secure that no information**
 > **is lost when running experiments and that your experiments are reproducible?**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *We made use of config files. Whenever an experiment is run the following happens: ... . To reproduce an experiment*
-> *one would have to do ...*
->
 > Answer:
 
---- question 13 fill here ---
+We used the WANDB (Weights and Biases) framework to run our experiments, since it's a good solution for logging experiments and visualizations and plots. We did not make use of any config files or the hydra framework, instead we used the WandbLogger object to log the training loss and accuracy in the training process, and it also logged the hyperparameters used in training: "batch_size", "epochs" and "learning_rate", which can then be found when clicking on the run: "Files" -> "config.yaml" at the bottom. This makes sure that we or others can reproduce the experiment later on with the exact same hyperparameters if we want.
 
 ### Question 14
 
 > **Upload 1 to 3 screenshots that show the experiments that you have done in W&B (or another experiment tracking**
 > **service of your choice). This may include loss graphs, logged images, hyperparameter sweeps etc. You can take**
-> **inspiration from [this figure](figures/wandb.png). Explain what metrics you are tracking and why they are**
-> **important.**
->
-> Recommended answer length: 200-300 words + 1 to 3 screenshots.
->
-> Example:
-> *As seen in the first image when have tracked ... and ... which both inform us about ... in our experiments.*
-> *As seen in the second image we are also tracking ... and ...*
+> **Explain what metrics you are tracking and why they are**
 >
 > Answer:
 
---- question 14 fill here ---
+Following are three screenshots that show training metrics from a machine learning experiment.
+
+![Training Loss per Step](figures/train_loss.png)
+
+The first image displays training loss per step, dropping significantly from 4.0 to nearly 0 over 8,000 steps. The sharp initial decline followed by stabilization indicates good model convergence.
+
+![Training Loss per Step](figures/train_acc_step.png)
+
+The second image shows training accuracy per step, rising from 0 to almost 100% within the first 2,000 steps with minor fluctuations thereafter. This demonstrates effective learning and stable performance maintenance.
+
+![Loss per Epoch](figures/train_loss_epoch.png)
+
+The third image shows loss per epoch, decreasing from about 0.9 to 0.1 between epochs 3,000 and 5,000. This provides a broader view of the training process by smoothing step-level fluctuations.
+
+These metrics offer complementary insights into the training process. Step-level metrics show detailed learning behavior, while epoch-level loss provides a more aggregated overview. Tracking both helps identify training issues early, confirm stable convergence, and determine optimal training duration. The decreasing loss combined with increasing accuracy indicates successful training, with the model achieving both good optimization and practical performance.
 
 ### Question 15
 
 > **Docker is an important tool for creating containerized applications. Explain how you used docker in your**
 > **experiments/project? Include how you would run your docker images and include a link to one of your docker files.**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *For our project we developed several images: one for training, inference and deployment. For example to run the*
-> *training docker image: `docker run trainer:latest lr=1e-3 batch_size=64`. Link to docker file: <weblink>*
->
 > Answer:
 
---- question 15 fill here ---
+For our project, we utilized Docker to create containerized environments for training, evaluating, and serving our machine learning models. We developed three distinct Dockerfiles for specific purposes:
+
+1. **Training:** The `train.dockerfile` builds an image for training our model. It installs dependencies, sets up the training script, and is executed with the command:
+   ```
+   docker build -f train.dockerfile . -t trainer:latest
+   docker run trainer:latest
+   ```
+   This ensures our model training pipeline can run consistently in any environment.
+
+2. **Evaluation:** The `evaluate.dockerfile` is used for model evaluation. The command to execute is:
+   ```
+   docker build -f evaluate.dockerfile . -t evaluator:latest
+   docker run evaluator:latest
+   ```
+
+3. **API Deployment:** The `api.dockerfile` sets up a FastAPI-based REST API for model inference. The Docker container includes the model checkpoint and a `uvicorn` server for serving the API. It can be built and run with:
+   ```
+   docker build -f api.dockerfile . -t api:latest
+   docker run -p 8080:8080 api:latest
+   ```
+   This exposes the API on port 8080, making it accessible for predictions.
+
+Link to the Dockerfiles: [Dockerfiles in GitHub](https://github.com/miickii/mlops_project/tree/main/dockerfiles).
 
 ### Question 16
 
 > **When running into bugs while trying to run your experiments, how did you perform debugging? Additionally, did you**
 > **try to profile your code or do you think it is already perfect?**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *Debugging method was dependent on group member. Some just used ... and others used ... . We did a single profiling*
-> *run of our main code at some point that showed ...*
->
 > Answer:
 
---- question 16 fill here ---
+Our debugging approach primarily relied on the use of print statements to identify and resolve issues in the code. While we recognize that using a debugger could have been more efficient in certain cases, we found print statements to be straightforward and sufficient for our needs, especially given the collaborative nature of our workflow. 
+
+Regarding code profiling, we did not perform any formal profiling during the project. While we aimed to write efficient and optimized code, we recognize that profiling could have been a valuable step to identify potential bottlenecks, particularly in areas like data loading, model training, or hyperparameter optimization.
+
+In hindsight, incorporating a debugger or tools like cProfile or line_profiler could have enhanced our debugging process and provided deeper insights into our code’s performance. However, given the scale and scope of our project, our chosen methods proved sufficient for achieving our goals.
 
 ## Working in the cloud
 
@@ -383,14 +392,15 @@ This command specifies the number of epochs, batch size, learning rate, and mode
 
 > **List all the GCP services that you made use of in your project and shortly explain what each service does?**
 >
-> Recommended answer length: 50-200 words.
->
-> Example:
-> *We used the following two services: Engine and Bucket. Engine is used for... and Bucket is used for...*
->
 > Answer:
 
---- question 17 fill here ---
+In our project, we utilized several Google Cloud Platform (GCP) services to enhance efficiency and collaboration. First, we used Google Cloud Storage to store and manage our datasets. This service allowed us to handle large amounts of image data through shared buckets, which were seamlessly integrated with DVC for version control.
+
+We also leveraged Vertex AI for training and deploying our machine learning models. This platform provided tools for managing experiments and monitoring model performance. Additionally, Compute Engine was used to run resource-intensive tasks like model training on virtual machines.
+
+To ensure consistency across development and deployment, we used Artifact Registry to store and manage Docker container images. For hosting and testing our trained models, we deployed them using Cloud Run, which offered a scalable and serverless environment. Lastly, we utilized Cloud Build to automate the creation and deployment of Docker containers.
+
+By combining these GCP services, we achieved a scalable and efficient workflow.
 
 ### Question 18
 
@@ -410,16 +420,15 @@ This command specifies the number of epochs, batch size, learning rate, and mode
 ### Question 19
 
 > **Insert 1-2 images of your GCP bucket, such that we can see what data you have stored in it.**
-> **You can take inspiration from [this figure](figures/bucket.png).**
 >
 > Answer:
 
---- question 19 fill here ---
+![Our GCP bucket](figures/gcp_bucket.png)
 
 ### Question 20
 
 > **Upload 1-2 images of your GCP artifact registry, such that we can see the different docker images that you have**
-> **stored. You can take inspiration from [this figure](figures/registry.png).**
+> **stored**
 >
 > Answer:
 
