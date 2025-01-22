@@ -76,6 +76,8 @@ if not Path(MODEL_PATH).exists():
 if not Path(LABELS_PATH).exists():
     raise FileNotFoundError(f"Labels file not found at {LABELS_PATH}")
 
+print(f"Loading model from: {MODEL_PATH}")
+print(f"Loading labels from: {LABELS_PATH}")
 
 # Load model
 model = FruitClassifierModel.load_from_checkpoint(MODEL_PATH, lr=1e-4)
@@ -118,7 +120,7 @@ async def predict(file: UploadFile = File(...)):
 
         # Apply transformations
         input_tensor = transform(image).unsqueeze(0).to(DEVICE)
-    
+
         # Inference
         with torch.no_grad():
             outputs = model(input_tensor)

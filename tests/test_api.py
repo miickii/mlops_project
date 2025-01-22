@@ -1,5 +1,4 @@
 from fastapi.testclient import TestClient
-from mlops_project.api import app
 import os
 from google.cloud import storage
 
@@ -20,17 +19,22 @@ def download_from_gcs(bucket_name, source_blob_name, destination_file_name):
         source_blob_name (str): Path to the blob in GCS.
         destination_file_name (str): Local destination path.
     """
+    print(f"Checking if {destination_file_name} exists...")
     if not os.path.exists(destination_file_name):
+        print(f"Downloading {source_blob_name} from bucket {bucket_name}...")
         client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(source_blob_name)
         blob.download_to_filename(destination_file_name)
         print(f"Downloaded {source_blob_name} to {destination_file_name}")
+    else:
+        print(f"File already exists at {destination_file_name}")
 
 # Ensure the model and labels are available locally
 download_from_gcs(BUCKET_NAME, MODEL_BLOB_PATH, MODEL_LOCAL_PATH)
 download_from_gcs(BUCKET_NAME, LABELS_BLOB_PATH, LABELS_LOCAL_PATH)
 
+from mlops_project.api import app
 client = TestClient(app)
 
 def test_read_root():

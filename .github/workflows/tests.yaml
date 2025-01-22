@@ -59,6 +59,8 @@ jobs:
     - name: Test with coverage
       env:
         WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+        MODEL_PATH: /tmp/fruits_model.ckpt
+        LABELS_PATH: /tmp/classes.json
       run: |
         coverage run -m pytest -v # Run tests with coverage measurement
         coverage report
