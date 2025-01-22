@@ -181,5 +181,4 @@ data/raw/
 models/
 lightning_logs/
 wandb/
-reports/figures
 cloudbuild.yaml
