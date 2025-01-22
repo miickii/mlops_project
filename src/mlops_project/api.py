@@ -80,7 +80,7 @@ print(f"Loading model from: {MODEL_PATH}")
 print(f"Loading labels from: {LABELS_PATH}")
 
 # Load model
-model = FruitClassifierModel.load_from_checkpoint(MODEL_PATH, lr=1e-4)
+model = FruitClassifierModel.load_from_checkpoint(MODEL_PATH, lr=1e-4, map_location=torch.device("cpu"))
 model.to(DEVICE)
 model.eval()
 

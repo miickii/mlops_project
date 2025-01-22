@@ -239,30 +239,22 @@ In total, we have implemented **4 tests**:
 > **What is the total code coverage (in percentage) of your code? If your code had a code coverage of 100% (or close**
 > **to), would you still trust it to be error free? Explain you reasoning.**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *The total code coverage of code is X%, which includes all our source code. We are far from 100% coverage of our **
-> *code and even if we were then...*
->
 > Answer:
 
---- question 8 fill here ---
+The total code coverage of our code is 77%, which includes all of our source code that is involved in training the model and using api in the project. That is pretty good coverage, only 23% of our code is not covered by our own unit tests. However this is not necessarily a sign of error-free code. That just means that our unit tests cover 77% of the code, and that whatever we specifically test for in the unit tests pass. But there could still be errors and bugs in the code, that the unit tests do not catch/cover.
 
 ### Question 9
 
 > **Did you workflow include using branches and pull requests? If yes, explain how. If not, explain how branches and**
 > **pull request can help improve version control.**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *We made use of both branches and PRs in our project. In our group, each member had an branch that they worked on in*
-> *addition to the main branch. To merge code we ...*
->
 > Answer:
 
---- question 9 fill here ---
+For our project, we collaborated closely most of the time when writing code and solving problems. This meant that we were usually in agreement when pushing new code, and as a result, we did not frequently use pull requests. However, we did utilize branches at a key point in our workflow. Specifically, when we decided to incorporate the PyTorch Lightning framework, we created a separate branch to experiment with its integration. This approach allowed us to test the framework's compatibility with our existing code without risking the stability of the main branch.
+
+Once we verified that the Lightning framework worked as intended, we collectively agreed to merge the branch into the main branch. From that point forward, we resumed working directly on the main branch.
+
+Although we did not use pull requests regularly, we recognize their importance in improving version control, particularly for larger teams. Pull requests provide a mechanism for code review, helping to identify errors and ensure that only well-tested code is merged. In future projects we might concider incorporating more branches and pull requests could enhance collaboration and reduce potential conflicts.
 
 ### Question 10
 
@@ -285,16 +277,21 @@ In total, we have implemented **4 tests**:
 > **linting, etc.)? Do you test multiple operating systems, Python  version etc. Do you make use of caching? Feel free**
 > **to insert a link to one of your GitHub actions workflow.**
 >
-> Recommended answer length: 200-300 words.
->
-> Example:
-> *We have organized our continuous integration into 3 separate files: one for doing ..., one for running ... testing*
-> *and one for running ... . In particular for our ..., we used ... .An example of a triggered workflow can be seen*
-> *here: <weblink>*
->
 > Answer:
 
---- question 11 fill here ---
+Our continuous integration (CI) setup is implemented using GitHub Actions. The CI workflow is defined in a single YAML file that covers several key aspects:
+
+1. **Unit Testing**: We use `pytest` to run unit tests that cover the API, data processing, model training, and evaluation components of our project. The tests validate that the critical functionality of our codebase works as expected.
+
+2. **Multi-Environment Testing**: To ensure compatibility across platforms, our workflow runs tests on multiple operating systems, specifically `macOS` and `Windows`. Additionally, we test the code against multiple Python versions (`3.11` and `3.12`), increasing the robustness of our setup.
+
+3. **Dependency Management and Caching**: We manage dependencies through `pip` and use caching for `pip` dependencies to reduce build times. This ensures that dependencies are installed efficiently and reproducibly across builds.
+
+4. **Integration with Google Cloud**: The CI workflow authenticates with Google Cloud using a service account and pulls required data and models stored in Google Cloud Storage using `DVC`. Environment variables for model paths and API keys (e.g., `WANDB_API_KEY`) are securely injected through GitHub Secrets.
+
+5. **Test Coverage**: We measure test coverage using the `coverage` package to ensure that our tests cover the critical parts of the codebase. A coverage report is generated at the end of the workflow.
+
+An example of our CI workflow can be seen [here](https://github.com/miickii/mlops_project/actions/runs/12912001211/workflow). This workflow is triggered on every push and pull request to the `main` branch.
 
 ## Running code and tracking experiments
 
@@ -306,14 +303,15 @@ In total, we have implemented **4 tests**:
 > **How did you configure experiments? Did you make use of config files? Explain with coding examples of how you would**
 > **run a experiment.**
 >
-> Recommended answer length: 50-100 words.
->
-> Example:
-> *We used a simple argparser, that worked in the following way: Python  my_script.py --lr 1e-3 --batch_size 25*
->
 > Answer:
 
---- question 12 fill here ---
+We used **Typer** to configure and run experiments, allowing us to provide parameters for training and evaluation directly from the command line. This ensured flexibility and reproducibility while keeping the setup user-friendly. For example, to train the model, we could run:
+
+```bash
+python src/mlops_project/train_lightning.py  --epochs 5 --batch-size 32 --lr 1e-4 --model-name "fruits_model"
+```
+
+This command specifies the number of epochs, batch size, learning rate, and model name. The script also integrates **WandB** for tracking experiment metrics and saving models.
 
 ### Question 13
 
