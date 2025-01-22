@@ -62,5 +62,5 @@ jobs:
         MODEL_PATH: /tmp/fruits_model.ckpt
         LABELS_PATH: /tmp/classes.json
       run: |
-        coverage run -m pytest -v # Run tests with coverage measurement
+        coverage run -m pytest -s -v # Run tests with coverage measurement
         coverage report
