@@ -55,10 +55,6 @@ jobs:
     - name: Pull data
       run: dvc pull
 
-    - name: Set environment variables for MPS
-      run: |
-        export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
-
     # Run tests with coverage
     - name: Test with coverage
       env:
