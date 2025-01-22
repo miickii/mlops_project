@@ -144,15 +144,9 @@ s234803, s234866, s231255
 > **A requirement to the project is that you include a third-party package not covered in the course. What framework**
 > **did you choose to work with and did it help you complete the project?**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *We used the third-party framework ... in our project. We used functionality ... and functionality ... from the*
-> *package to do ... and ... in our project*.
->
 > Answer:
 
---- question 3 fill here ---
+We decided to use the "PyTorch Image Models" package. We are using the TIMM package to load in an image model with pretrained weights. We decided to use the ResNet(18) model for this. The ResNet(18) model is a powerful Convolutional Neural Network with 18 layers, that is trained on the exstensive image dataset called ImageNet with millions of images and 1000 classes. We reconfigured the final linear layer to match the number of classes in our dataset, so we changed it to have 141 output neurons. Our dataset consists of fruits and vegetables, while the ImageNet consists of many other objects, however the pretrained weights are still useful in general object recognition (edges, patterns, intensity etc.), so it's very helpful to not have to train a model from scratch.
 
 ## Coding environment
 
@@ -164,46 +158,60 @@ s234803, s234866, s231255
 > **Explain how you managed dependencies in your project? Explain the process a new team member would have to go**
 > **through to get an exact copy of your environment.**
 >
-> Recommended answer length: 100-200 words
->
-> Example:
-> *We used ... for managing our dependencies. The list of dependencies was auto-generated using ... . To get a*
-> *complete copy of our development environment, one would have to run the following commands*
->
 > Answer:
 
---- question 4 fill here ---
+### Question 4
+
+We managed our project dependencies using a **`conda` environment**, which allowed us to maintain a consistent and reproducible setup across different machines.
+
+To help new team members set up an exact copy of the development environment, we provided a `requirements.txt`, `requirements_dev.txt` and `requirements_tests.txt` file. Here’s how a new team member can replicate the environment:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/miickii/mlops_project.git
+   cd mlops_project
+   ```
+
+2. Create the `conda` environment and install python:
+   ```bash
+   conda env create <environment-name> python=3.11
+   ```
+
+3. Activate the environment:
+   ```bash
+   conda activate <environment-name>
+   ```
+
+4. For dependencies, install from the requirements files:
+   ```bash
+   pip install -r requirements.txt
+   pip install -r requirements_dev.txt
+   pip install -r requirements_tests.txt
+   ```
+
+By following these steps, the team member will have the same environment required for running and developing the project.
 
 ### Question 5
 
 > **We expect that you initialized your project using the cookiecutter template. Explain the overall structure of your**
 > **code. What did you fill out? Did you deviate from the template in some way?**
 >
-> Recommended answer length: 100-200 words
->
-> Example:
-> *From the cookiecutter template we have filled out the ... , ... and ... folder. We have removed the ... folder*
-> *because we did not use any ... in our project. We have added an ... folder that contains ... for running our*
-> *experiments.*
->
 > Answer:
 
---- question 5 fill here ---
+To initiate our project, we used the cookiecutter template, following the structure outlined in the exercises. The template provided a solid foundation, but we made several modifications to suit our project's requirements. Specifically, we added separate training and model scripts to better organize our code. These scripts utilized the PyTorch Lightning framework, which we opted for instead of the original model and training scripts provided by the template.
+
+Additionally, we introduced a dedicated folder for Weights and Biases (W&B) to facilitate efficient experiment tracking and model performance visualization. To integrate W&B seamlessly, we added a .env file, allowing each team member to securely store and use their own API key for model training. 
+
+Overall, while we adhered to the template's structure for most of the project, these adjustments allowed us to create a more efficient workflow tailored to our specific needs and preferences.
 
 ### Question 6
 
 > **Did you implement any rules for code quality and format? What about typing and documentation? Additionally,**
 > **explain with your own words why these concepts matters in larger projects.**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *We used ... for linting and ... for formatting. We also used ... for typing and ... for documentation. These*
-> *concepts are important in larger projects because ... . For example, typing ...*
->
 > Answer:
 
---- question 6 fill here ---
+We implemented typing where it made sense: in function parameters mostly. We wrote most of the code together, so not a lot of comments and documentation was necessary to help each other, but we still made comments where it made sense. We also implemented ruff in the pre-hook commits for linting to try to keep a good coding format and a certain structure. These concepts are very helpful in larger projects especially, because it can be very difficult to read and understand other people's code without any context. Following a certain structure and using documentation can help other people understand your code.
 
 ## Version control
 
@@ -214,15 +222,17 @@ s234803, s234866, s231255
 
 > **How many tests did you implement and what are they testing in your code?**
 >
-> Recommended answer length: 50-100 words.
->
-> Example:
-> *In total we have implemented X tests. Primarily we are testing ... and ... as these the most critical parts of our*
-> *application but also ... .*
->
 > Answer:
 
---- question 7 fill here ---
+In total, we have implemented **4 tests**:
+
+1. **API Tests**: These tests validate the FastAPI endpoints. We check that the root endpoint (`/`) responds with the correct message and that the `/predict/` endpoint correctly processes an uploaded image and returns predictions with confidence scores.
+
+2. **Data Tests**: These tests validate the integrity of the dataset. We ensure that the dataset size matches the expected number of samples, the data is in the correct format (images as tensors and labels within the expected range), and unique labels are valid.
+
+3. **Model Tests**: These tests verify the correctness of the model architecture by ensuring the output shape matches the expected number of classes when given a mock input image.
+
+4. **Training Tests**: These tests validate the training pipeline. We test dataset loading, batching, and integration with the PyTorch Lightning trainer. A small subset of the dataset is used for faster testing, and we verify that the training process initializes and runs correctly.
 
 ### Question 8
 
