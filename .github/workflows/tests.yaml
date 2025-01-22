@@ -47,12 +47,22 @@ jobs:
 
 
     # Pull data using DVC
-    - name: Get data
+    # Set up DVC
+    - name: Set up DVC
       uses: iterative/setup-dvc@v1
+
+    # Pull data using DVC
+    - name: Pull data
       run: dvc pull
+
+    - name: Set environment variables for MPS
+      run: |
+        export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0
 
     # Run tests with coverage
     - name: Test with coverage
+      env:
+        WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
       run: |
         coverage run -m pytest -v # Run tests with coverage measurement
         coverage report

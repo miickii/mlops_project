@@ -5,6 +5,7 @@ import torch
 import torchvision.transforms as transforms
 import json
 from mlops_project.model_lightning import FruitClassifierModel
+import os
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -12,7 +13,7 @@ app = FastAPI()
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 # Load model
-MODEL_PATH = "../models/fruits_model.ckpt"  # Update with your model checkpoint path
+MODEL_PATH = os.path.join("models/fruits_model.ckpt")  # Update with your model checkpoint path
 model = FruitClassifierModel.load_from_checkpoint(MODEL_PATH, lr=1e-4)
 model.eval()
 
@@ -30,7 +31,7 @@ def load_labels(mapping_path: str) -> dict:
     return idx_to_class
 
 # Example usage
-mapping_path = "../data/processed/classes.json"
+mapping_path = os.path.join("data/processed/classes.json")
 labels = load_labels(mapping_path)
 print(labels)
 
