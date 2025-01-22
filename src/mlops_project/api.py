@@ -8,6 +8,7 @@ import json
 import timm
 from torch import nn
 from pathlib import Path
+import os
 
 def ProjectModel(num_classes: int, pretrained:bool = True):
     """
@@ -65,9 +66,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent  # Adjust based on proj
 MODEL_PATH = BASE_DIR / "models/fruits_model.ckpt"
 LABELS_PATH = BASE_DIR / "data/processed/classes.json"
 
-# Load model
-if not MODEL_PATH.exists():
+MODEL_PATH = os.getenv("MODEL_PATH", MODEL_PATH)
+LABELS_PATH = os.getenv("LABELS_PATH", LABELS_PATH)
+
+# Validate model and labels paths
+if not Path(MODEL_PATH).exists():
     raise FileNotFoundError(f"Model file not found at {MODEL_PATH}")
+
+if not Path(LABELS_PATH).exists():
+    raise FileNotFoundError(f"Labels file not found at {LABELS_PATH}")
+
 
 # Load model
 model = FruitClassifierModel.load_from_checkpoint(MODEL_PATH, lr=1e-4)
@@ -110,7 +118,7 @@ async def predict(file: UploadFile = File(...)):
 
         # Apply transformations
         input_tensor = transform(image).unsqueeze(0).to(DEVICE)
-
+    
         # Inference
         with torch.no_grad():
             outputs = model(input_tensor)
