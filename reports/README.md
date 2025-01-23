@@ -161,8 +161,6 @@ We decided to use the "PyTorch Image Models" package. We are using the TIMM pack
 >
 > Answer:
 
-### Question 4
-
 We managed our project dependencies using a **`conda` environment**, which allowed us to maintain a consistent and reproducible setup across different machines. A `conda` environment ensures that all dependencies, including Python and package versions, are properly managed and isolated.
 
 To help new team members set up an exact copy of the development environment, we provided a `requirements.txt`, `requirements_tests.txt`, `requirements_dev.txt` and `requirements_frontend.txt` file. Here’s how a new team member can replicate the environment:
