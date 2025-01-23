@@ -223,13 +223,13 @@ We implemented typing where it made sense: in function parameters mostly. We wro
 
 In total, we have implemented **4 tests**:
 
-1. **API Tests**: These tests validate the FastAPI endpoints. We check that the root endpoint (`/`) responds with the correct message and that the `/predict/` endpoint correctly processes an uploaded image and returns predictions with confidence scores.
+1. **API Tests**: Validate FastAPI endpoints, ensuring the root (`/`) returns the correct message and `/predict/` processes images, returning predictions and confidence scores.
 
-2. **Data Tests**: These tests validate the integrity of the dataset. We ensure that the dataset size matches the expected number of samples, the data is in the correct format (images as tensors and labels within the expected range), and unique labels are valid.
+2. **Data Tests**: Check dataset size, format (images as tensors, labels in range), and validity of unique labels.
 
-3. **Model Tests**: These tests verify the correctness of the model architecture by ensuring the output shape matches the expected number of classes when given a mock input image.
+3. **Model Tests**: Ensure the model's output shape matches the expected number of classes with a mock input.
 
-4. **Training Tests**: These tests validate the training pipeline. We test dataset loading, batching, and integration with the PyTorch Lightning trainer. A small subset of the dataset is used for faster testing, and we verify that the training process initializes and runs correctly.
+4. **Training Tests**: Test dataset loading, batching, and integration with PyTorch Lightning. Use a small dataset subset to verify the training process runs smoothly.
 
 ### Question 8
 
@@ -238,7 +238,7 @@ In total, we have implemented **4 tests**:
 >
 > Answer:
 
-The total code coverage of our code is 77%, which includes all of our source code that is involved in training the model and using api in the project. That is pretty good coverage, only 23% of our code is not covered by our own unit tests. However this is not necessarily a sign of error-free code. That just means that our unit tests cover 77% of the code, and that whatever we specifically test for in the unit tests pass. But there could still be errors and bugs in the code, that the unit tests do not catch/cover.
+The total code coverage of our code is 77%, which includes all of our source code that is involved in training the model and using api in the project. That is pretty good coverage, only 23% of our code is not covered by our own unit tests. However this is not necessarily a sign of error-free code. That just means that our unit tests cover 77% of the code, and that whatever we specifically test for in the unit tests pass. But there could still be errors and bugs in the code, that the unit tests do not catch nor cover.
 
 ### Question 9
 
@@ -329,15 +329,15 @@ Following are three screenshots that show training metrics from a machine learni
 
 ![Training Loss per Step](figures/train_loss_step.png)
 
-The first image displays training loss per step, dropping significantly from 4.0 to nearly 0 over 8,000 steps. The sharp initial decline followed by stabilization indicates good model convergence.
+We tracked the training loss per step metric during our experiments, as shown in the graph above. This metric helps us understand how well the model is optimizing during training. The graph starts with a high loss value, around 4.0, and gradually decreases to nearly 0 over approximately 4,000 steps. This trend indicates that the model is learning effectively, with a sharp decline in the initial steps and a smoother convergence afterward.
 
 ![Training Loss per Step](figures/train_acc_step.png)
 
-The second image shows training accuracy per step, rising from 0 to almost 100% within the first 2,000 steps with minor fluctuations thereafter. This demonstrates effective learning and stable performance maintenance.
+The second image shows training accuracy per step, rising from 0 to almost 100% within the first 1,000 steps with minor fluctuations thereafter. This demonstrates effective learning and stable performance maintenance.
 
 ![Loss per Epoch](figures/train_loss_epoch.png)
 
-The third image shows loss per epoch, decreasing from about 0.9 to 0.1 between epochs 3,000 and 5,000. This provides a broader view of the training process by smoothing step-level fluctuations.
+This graph shows the training loss per epoch. The loss decreases sharply during the first epoch, dropping from around 1.5 to nearly 0.5. Afterward, the loss continues to decline at a slower rate, reaching a value close to 0 by the end of training.
 
 These metrics offer complementary insights into the training process. Step-level metrics show detailed learning behavior, while epoch-level loss provides a more aggregated overview. Tracking both helps identify training issues early, confirm stable convergence, and determine optimal training duration. The decreasing loss combined with increasing accuracy indicates successful training, with the model achieving both good optimization and practical performance.
 
@@ -427,7 +427,7 @@ We tried to use the Compute Engine in GCP for the exercises, but realized that t
 >
 > Answer:
 
---- question 20 fill here ---
+![Our GCP artifact registry](figures/artifacts.png)
 
 ### Question 21
 
@@ -436,22 +436,16 @@ We tried to use the Compute Engine in GCP for the exercises, but realized that t
 >
 > Answer:
 
---- question 21 fill here ---
+![Our Cloud Build history](figures/cloudbuild.png)
 
 ### Question 22
 
 > **Did you manage to train your model in the cloud using either the Engine or Vertex AI? If yes, explain how you did**
 > **it. If not, describe why.**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *We managed to train our model in the cloud using the Engine. We did this by ... . The reason we choose the Engine*
-> *was because ...*
->
 > Answer:
 
-Yes, we managed to train our fruits image classifier model using the Vertex AI service. For this to work, we first needed to build a docker image, that 
+Yes, we managed to train our fruits image classifier model using the Vertex AI service. For this to work, we first needed to build a docker image, that works as a virtual machine that is able to load data and then train a model. We then pushed the docker image to an Artifact Registry in GCP. We could then use the command line to create a custom job using Vertex AI, that runs a config file (.yaml) specifying the type of virtual machine and location of image on GCP. The service then automatically creates a VM instance and trains the model, which we found to be more effective than using the Compute Engine.
 
 ## Deployment
 
@@ -491,15 +485,11 @@ While our current implementation demonstrates proper unit testing practices, we 
 > **Did you manage to implement monitoring of your deployed model? If yes, explain how it works. If not, explain how**
 > **monitoring would help the longevity of your application.**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *We did not manage to implement monitoring. We would like to have monitoring implemented such that over time we could*
-> *measure ... and ... that would inform us about this ... behaviour of our application.*
->
 > Answer:
 
---- question 26 fill here ---
+Yes, we managed to implement monitoring for our deployed model. Our monitoring pipeline tracks data drift and target drift using the Evidently framework. Predictions made by the deployed model are logged asynchronously and stored in Google Cloud Storage (GCS) as JSON files. These files contain information such as the predicted class, confidence score, and metadata about the input.
+
+To monitor for drift, we can run our local monitoring.py script to fetch the latest predictions from GCS and compare them to the reference data, which represents the training dataset. Using Evidently's DataDriftPreset and TargetDriftPreset, we generate a comprehensive report that highlights any shifts in the distribution of input features or target labels. The report is then saved as a JSON file and uploaded to GCS for easy access and future analysis.
 
 ## Overall discussion of project
 
@@ -521,15 +511,11 @@ We faced several challenges working in the cloud, from setting up DVC to managin
 > **a frontend for your API, use extra version control features, a drift detection service, a kubernetes cluster etc.**
 > **If yes, explain what you did and why.**
 >
-> Recommended answer length: 0-200 words.
->
-> Example:
-> *We implemented a frontend for our API. We did this because we wanted to show the user ... . The frontend was*
-> *implemented using ...*
->
 > Answer:
 
---- question 28 fill here ---
+Yes, we implemented extra features in our project. One of them is a Streamlit-based frontend for our API. The frontend allows users to upload images and see their classification results along with the confidence score. This makes the model easier to use and accessible to non-technical users.
+
+We also added a data drift detection service using the Evidently framework. This service fetches predictions from Google Cloud Storage and compares them with the training data to detect changes in data distribution. It helps monitor the model’s performance over time and ensures it continues to work well in production.
 
 ### Question 29
 
@@ -537,30 +523,32 @@ We faced several challenges working in the cloud, from setting up DVC to managin
 > **You can take inspiration from [this figure](figures/overview.png). Additionally, in your own words, explain the**
 > **overall steps in figure.**
 >
-> Recommended answer length: 200-400 words
->
-> Example:
->
-> *The starting point of the diagram is our local setup, where we integrated ... and ... and ... into our code.*
-> *Whenever we commit code and push to GitHub, it auto triggers ... and ... . From there the diagram shows ...*
->
 > Answer:
 
---- question 29 fill here ---
+![architecture](figures/overview.png)
+
+The architecture of our system starts with local development, where we configure and run experiments using PyTorch Lightning. Model training and hyperparameter tuning are tracked using W&B for experiment logging and visualization. Once the best-performing model is identified, it is saved and prepared for deployment by containerizing it with Docker, ensuring portability and scalability across environments.
+
+We use GitHub for version control, where all code changes are managed. GitHub Actions automates the testing pipeline, which includes running unit tests, linting, type checking, and coverage reporting. This ensures code quality and minimizes errors. Once the code passes these checks, Docker containers are built and pushed to the Google Cloud Container Registry. This automated process ensures the most up-to-date version of the application is available for deployment.
+
+Our backend API, developed with FastAPI, serves as the interface for model inference. It is deployed on Google Cloud Run, leveraging the platform’s scalability to handle user requests efficiently. Users can interact with the API through a Streamlit frontend, where they upload images for classification. The backend processes the image, makes predictions using the trained model, and returns the result, which is displayed on the frontend.
+
+To monitor the system, we implemented data drift detection using EvidentlyAI. Predictions made by the API are logged to Google Cloud Storage. We periodically compare these predictions with reference data using Evidently's data drift and target drift reports. Any detected drift is saved to Google Cloud Storage for further analysis, ensuring that model performance remains consistent over time.
 
 ### Question 30
 
 > **Discuss the overall struggles of the project. Where did you spend most time and what did you do to overcome these**
 > **challenges?**
 >
-> Recommended answer length: 200-400 words.
->
-> Example:
-> *The biggest challenges in the project was using ... tool to do ... . The reason for this was ...*
->
 > Answer:
 
---- question 30 fill here ---
+The biggest challenge in the project was deploying and testing our API and ensuring everything worked in the cloud. One issue we spent a lot of time on was setting up correct file paths for our model and labels. Locally, everything worked fine, but in Google Cloud Run, the file structure was different, and we ran into many errors. We fixed this by making paths configurable using environment variables and checking that files existed before loading them.
+
+Another big problem was Google Cloud authentication. We got several errors when trying to access our storage bucket because the API didn’t have the right permissions. To solve this, we set up a service account with the correct roles and used GitHub Actions to pass the credentials securely to our workflows.
+
+There were also some issues with memory when testing the model locally on a Mac. These happened because the MPS (Metal Performance Shaders) backend ran out of memory. We solved this by forcing the model to use the CPU instead.
+
+Overall, most of our time went into fixing deployment problems, getting our api to work and debugging environment-specific issues. We learned alot through all the struggles and by the end, it was much easier to fix errors.
 
 ### Question 31
 
@@ -568,14 +556,19 @@ We faced several challenges working in the cloud, from setting up DVC to managin
 > **make sure all members contributed actively to the project. Additionally, state if/how you have used generative AI**
 > **tools in your project.**
 >
-> Recommended answer length: 50-300 words.
->
-> Example:
-> *Student sXXXXXX was in charge of developing of setting up the initial cookie cutter project and developing of the*
-> *docker containers for training our applications.*
-> *Student sXXXXXX was in charge of training our models in the cloud and deploying them afterwards.*
-> *All members contributed to code by...*
-> *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 
---- question 31 fill here ---
+s234803 was in charge of configuring DVC and connecting it to the remote storage in GCP, as well as getting it to work in github, such that the data could be pulled during tests in github actions. He also handled making the api test on our project. He also took care of additional cloud storage for our data.
+
+s234866 was in charge of setting up the project structure and getting all the files to work together, and handled the git repo. He also had a big contribution to preprocessing the data and setting up the training pipeline. Additionally he handled the frontend and how to get it working with the backend.
+
+s231255 was in charge of containerizing our files to be uploaded to GCP, this includes the api, where she trained different models and combined the best model with the api dockerfile. Additionally she handled the other docker builds for our frontend and evaluation. She handled the deployment of all the images to Cloud Run.
+
+We all had significant contributions to debugging during the process, and fixing errors. We also all contributed to the code by changing and adding to the files across our src/mlops_project folder.
+
+We used ChatGPT a lot to debug and also provide comments across our files. We have used it to help and guide us when we were lost. Additionally we used AI to proofwrite our report.
+
+Here are some memes that express the journey
+![meme1](figures/meme1.png)
+![meme2](figures/meme2.webp)
+![meme3](figures/meme3.webp)
