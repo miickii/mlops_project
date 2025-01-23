@@ -3,7 +3,7 @@ import os
 from google.cloud import storage
 
 # Constants
-BUCKET_NAME = "fruits_project_models"
+BUCKET_NAME = "fruits-mlops-model"
 MODEL_BLOB_PATH = "fruits_model.ckpt"
 LABELS_BLOB_PATH = "classes.json"
 MODEL_LOCAL_PATH = "/tmp/fruits_model.ckpt"
