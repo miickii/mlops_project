@@ -426,7 +426,7 @@ By combining these GCP services, we achieved a scalable and efficient workflow.
 >
 > Answer:
 
-![Our GCP bucket](figures/gcp_bucket.png)
+![Our GCP bucket](figures/GCP_bucket.png)
 
 ### Question 20
 
