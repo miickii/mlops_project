@@ -188,7 +188,12 @@ s234803, s234866, s231255
 >
 > Answer:
 
---- question 5 fill here ---
+To initiate our project, we used the cookiecutter template, following the structure outlined in the exercises. The template provided a solid foundation, but we made several modifications to suit our project's requirements. Specifically, we added separate training and model scripts to better organize our code. These scripts utilized the PyTorch Lightning framework, which we opted for instead of the original model and training scripts provided by the template.
+
+Additionally, we introduced a dedicated folder for Weights and Biases (W&B) to facilitate efficient experiment tracking and model performance visualization. To integrate W&B seamlessly, we added a .env file, allowing each team member to securely store and use their own API key for model training. 
+
+Overall, while we adhered to the template's structure for most of the project, these adjustments allowed us to create a more efficient workflow tailored to our specific needs and preferences.
+
 
 ### Question 6
 
@@ -252,7 +257,12 @@ s234803, s234866, s231255
 >
 > Answer:
 
---- question 9 fill here ---
+For our project, we collaborated closely most of the time when writing code and solving problems. This meant that we were usually in agreement when pushing new code, and as a result, we did not frequently use pull requests. However, we did utilize branches at a key point in our workflow. Specifically, when we decided to incorporate the PyTorch Lightning framework, we created a separate branch to experiment with its integration. This approach allowed us to test the framework's compatibility with our existing code without risking the stability of the main branch.
+
+Once we verified that the Lightning framework worked as intended, we collectively agreed to merge the branch into the main branch. From that point forward, we resumed working directly on the main branch.
+
+Although we did not use pull requests regularly, we recognize their importance in improving version control, particularly for larger teams. Pull requests provide a mechanism for code review, helping to identify errors and ensure that only well-tested code is merged. In future projects we might concider incorporating more branches and pull requests could enhance collaboration and reduce potential conflicts.
+
 
 ### Question 10
 
@@ -267,7 +277,10 @@ s234803, s234866, s231255
 >
 > Answer:
 
---- question 10 fill here ---
+To ensure we all worked with the same raw as well as prosseced data, we used data version control. One of the main reasons we wanted to untilize the data version control tool, was the sheer size of our dataset. As we were using pictures, the size of our dataset was too large to push to github, which gave us problems when we wished to incorporate github actions. The size also made the training and docker image building process much more teadius. We therefore decided to cut our dataset to half the size (remove half the images from each class). This made it that much more important to use DVC, as one of us manually trimmed the data, and we could not collect it from anywhere if we at some point made a mistake, and the data got removed. 
+At first we tried our hand at the google drive DVC, but as they have changed their policy for the google drive API, we were not succesfull in utilizing this DVC. We therefore went to the google cloud bucket, where the prosses went more smoothly. We got the data to the bucket using DVC, where we all succesfully pulled the data from one bucket we made public. With this method we made sure to all have the same trimmed data, and we were able to connect it to github to use it for github actions.
+
+
 
 ### Question 11
 
@@ -365,7 +378,11 @@ s234803, s234866, s231255
 >
 > Answer:
 
---- question 16 fill here ---
+Our debugging approach primarily relied on the use of print statements to identify and resolve issues in the code. While we recognize that using a debugger could have been more efficient in certain cases, we found print statements to be straightforward and sufficient for our needs, especially given the collaborative nature of our workflow. 
+
+Regarding code profiling, we did not perform any formal profiling during the project. While we aimed to write efficient and optimized code, we recognize that profiling could have been a valuable step to identify potential bottlenecks, particularly in areas like data loading, model training, or hyperparameter optimization.
+
+In hindsight, incorporating a debugger or tools like cProfile or line_profiler could have enhanced our debugging process and provided deeper insights into our code’s performance. However, given the scale and scope of our project, our chosen methods proved sufficient for achieving our goals.
 
 ## Working in the cloud
 
@@ -382,7 +399,13 @@ s234803, s234866, s231255
 >
 > Answer:
 
---- question 17 fill here ---
+In our project, we utilized several Google Cloud Platform (GCP) services to enhance efficiency and collaboration. First, we used Google Cloud Storage to store and manage our datasets. This service allowed us to handle large amounts of image data through shared buckets, which were seamlessly integrated with DVC for version control.
+
+We also leveraged Vertex AI for training and deploying our machine learning models. This platform provided tools for managing experiments and monitoring model performance. Additionally, Compute Engine was used to run resource-intensive tasks like model training on virtual machines.
+
+To ensure consistency across development and deployment, we used Artifact Registry to store and manage Docker container images. For hosting and testing our trained models, we deployed them using Cloud Run, which offered a scalable and serverless environment. Lastly, we utilized Cloud Build to automate the creation and deployment of Docker containers.
+
+By combining these GCP services, we achieved a scalable and efficient workflow.
 
 ### Question 18
 
