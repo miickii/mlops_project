@@ -161,7 +161,34 @@ We decided to use the "PyTorch Image Models" package. We are using the TIMM pack
 >
 > Answer:
 
---- question 4 fill here ---
+### Question 4
+
+We managed our project dependencies using a **`conda` environment**, which allowed us to maintain a consistent and reproducible setup across different machines. A `conda` environment ensures that all dependencies, including Python and package versions, are properly managed and isolated.
+
+To help new team members set up an exact copy of the development environment, we provided a `requirements.txt`, `requirements_tests.txt`, `requirements_dev.txt` and `requirements_frontend.txt` file. Here’s how a new team member can replicate the environment:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/miickii/mlops_project.git
+   cd mlops_project
+   ```
+
+2. Create the `conda` environment using the `environment.yml` file:
+   ```bash
+   conda env create <environment-name> python=3.11
+   ```
+
+3. Activate the environment:
+   ```bash
+   conda activate <environment-name>
+   ```
+
+4. For additional Python dependencies, install from the `requirements.txt` file:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+By following these steps, the team member will have the same environment required for running and developing the project. This approach ensures consistency, prevents dependency conflicts, and simplifies onboarding for new contributors.
 
 ### Question 5
 
@@ -399,7 +426,7 @@ We tried to use the Compute Engine in GCP for the exercises, but realized that t
 >
 > Answer:
 
-![Our GCP bucket](figures/gcp_bucket.png)
+![Our GCP bucket](figures/GCP_bucket.png)
 
 ### Question 20
 

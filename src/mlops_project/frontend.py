@@ -6,10 +6,14 @@ from io import BytesIO
 def classify_image(image_bytes, backend):
     """Send the image to the backend for classification."""
     predict_url = f"{backend}/predict/"
-    response = requests.post(predict_url, files={"file": BytesIO(image_bytes)}, timeout=10)
+    # Simulate a file-like object with a name
+    files = {"file": ("image.jpg", BytesIO(image_bytes), "image/jpeg")}
+    response = requests.post(predict_url, files=files, timeout=10)
     if response.status_code == 200:
         return response.json()
-    return None
+    else:
+        print(f"Error {response.status_code}: {response.text}")  # For debugging purposes
+        return None
 
 def main() -> None:
     """Main function of the Streamlit frontend."""
