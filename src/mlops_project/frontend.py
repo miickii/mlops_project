@@ -1,12 +1,12 @@
 import os
 import requests
 import streamlit as st
-from PIL import Image
+from io import BytesIO
 
-def classify_image(image, backend):
+def classify_image(image_bytes, backend):
     """Send the image to the backend for classification."""
     predict_url = f"{backend}/predict/"
-    response = requests.post(predict_url, files={"file": image}, timeout=10)
+    response = requests.post(predict_url, files={"file": BytesIO(image_bytes)}, timeout=10)
     if response.status_code == 200:
         return response.json()
     return None
@@ -17,7 +17,7 @@ def main() -> None:
     st.set_page_config(page_title="Fruits Classifier", page_icon="🍓")
 
     # Define your backend URL
-    backend = "https://mlops-fruit-project-5pl7l76ovq-ew.a.run.app/"
+    backend = "https://mlops-fruits-api-10603713134.europe-west1.run.app/"
     if backend is None:
         raise ValueError("Backend service not found")
 
