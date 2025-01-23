@@ -459,7 +459,7 @@ We tried to use the Compute Engine in GCP for the exercises, but realized that t
 >
 > Answer:
 
---- question 22 fill here ---
+Yes, we managed to train our fruits image classifier model using the Vertex AI service. For this to work, we first needed to build a docker image, that 
 
 ## Deployment
 
