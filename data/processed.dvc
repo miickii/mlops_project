@@ -1,6 +1,39 @@
 outs:
 - hash: md5
   path: processed
-  md5: 44ff48b158f1428c6179d1f2e4c4ef9c.dir
-  size: 5644463860
-  nfiles: 5
+  files:
+  - relpath: classes.json
+    md5: fdcbfe827a33d36d925d9f377d644917
+    size: 2848
+    cloud:
+      remote_storage:
+        etag: 08f1c9c7a3dd8b8b031001
+        version_id: '1737631368078577'
+  - relpath: test_images.pt
+    md5: b0b05d7b49b5c24e3b0ea2b98c477904
+    size: 1415881200
+    cloud:
+      remote_storage:
+        etag: 08b7dafcf2de8b8b031001
+        version_id: '1737631803059511'
+  - relpath: test_targets.pt
+    md5: 4f3a3a4f96e6f31abde450ffa70feda6
+    size: 95541
+    cloud:
+      remote_storage:
+        etag: 08e5e1cca3dd8b8b031001
+        version_id: '1737631368163557'
+  - relpath: train_images.pt
+    md5: daea2068409329faa2b050a992c9661b
+    size: 4228201205
+    cloud:
+      remote_storage:
+        etag: 08cbeed8ece08b8b031001
+        version_id: '1737632326760267'
+  - relpath: train_targets.pt
+    md5: e1affb7f3cd62b14e45725a0e64a6cd2
+    size: 283066
+    cloud:
+      remote_storage:
+        etag: 08dd85baa3dd8b8b031001
+        version_id: '1737631367856861'
