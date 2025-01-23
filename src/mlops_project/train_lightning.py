@@ -24,9 +24,9 @@ app = typer.Typer()
 
 @app.command()
 def train(
-    epochs: int = 1,
+    epochs: int = 5,
     batch_size: int = 32,
-    lr: float = 1e-4,
+    lr: float = 1e-3,
     model_name: str = "fruits_model",
     project_name: str = "fruits_classification",
 ):
