@@ -183,3 +183,5 @@ lightning_logs/
 wandb/
 reports/figures
 cloudbuild.yaml
+configs/config_cpu.yaml
+configs/config_gpu.yaml
