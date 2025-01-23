@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks
 from io import BytesIO
 from PIL import Image
 import torch
@@ -9,6 +9,9 @@ import timm
 from torch import nn
 from pathlib import Path
 import os
+from google.cloud import storage
+from datetime import datetime
+import uuid
 
 def ProjectModel(num_classes: int, pretrained:bool = True):
     """
@@ -58,11 +61,36 @@ class FruitClassifierModel(LightningModule):
 # Initialize FastAPI app
 app = FastAPI()
 
+# GCS Configuration
+GCS_BUCKET_NAME = os.getenv("GCS_BUCKET_NAME", "mlops-predictions")  # Replace with your bucket name
+GCS_CLIENT = storage.Client()
+
+def upload_to_gcs(bucket_name: str, file_name: str, data: bytes):
+    """Upload data to a GCS bucket."""
+    bucket = GCS_CLIENT.bucket(bucket_name)
+    blob = bucket.blob(file_name)
+    blob.upload_from_string(data)
+
+def log_prediction(image_bytes: bytes, prediction: dict):
+    """Log prediction data to GCS."""
+    # Generate a unique filename
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    file_name = f"predictions/{timestamp}_{uuid.uuid4().hex}.json"
+
+    # Save prediction data as JSON
+    prediction_data = {
+        "timestamp": timestamp,
+        "predicted_class": prediction["predicted_class"],
+        "confidence": prediction["confidence"],
+        "image_size": len(image_bytes),
+    }
+    upload_to_gcs(GCS_BUCKET_NAME, file_name, json.dumps(prediction_data).encode())
+
+# Device configuration
 DEVICE = torch.device("cpu")  # Default to CPU since Cloud Run uses CPUs
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # Adjust based on project structure
-
 # Define paths to model and labels
+BASE_DIR = Path(__file__).resolve().parent.parent.parent  # Adjust based on project structure
 MODEL_PATH = BASE_DIR / "models/fruits_model.ckpt"
 LABELS_PATH = BASE_DIR / "data/processed/classes.json"
 
@@ -84,6 +112,7 @@ model = FruitClassifierModel.load_from_checkpoint(MODEL_PATH, lr=1e-4, map_locat
 model.to(DEVICE)
 model.eval()
 
+# Image transformations
 transform = transforms.Compose([
     transforms.Resize((100, 100)),
     transforms.ToTensor(),
@@ -97,9 +126,8 @@ def load_labels(mapping_path: str) -> dict:
     idx_to_class = {v: k for k, v in class_to_idx.items()}  # Reverse the dictionary
     return idx_to_class
 
-# Example usage
+# Load labels
 labels = load_labels(LABELS_PATH)
-#print(labels)
 
 @app.get("/")
 def read_root():
@@ -110,7 +138,7 @@ def health_check():
     return {"status": "ok"}
 
 @app.post("/predict/")
-async def predict(file: UploadFile = File(...)):
+async def predict(file: UploadFile = File(...), background_tasks: BackgroundTasks = None):
     try:
         if file.size > 5 * 1024 * 1024:  # 5 MB limit
             raise HTTPException(status_code=400, detail="File too large")
@@ -130,8 +158,13 @@ async def predict(file: UploadFile = File(...)):
             confidence = probabilities.max().item()
 
         predicted_label = labels[predicted_index]
+        prediction_result = {"predicted_class": predicted_label, "confidence": confidence}
 
-        return {"predicted_class": predicted_label, "confidence": confidence}
+        # Log prediction in the background
+        if background_tasks:
+            background_tasks.add_task(log_prediction, image_bytes, prediction_result)
+
+        return prediction_result
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error during prediction: {e}")
