@@ -1,9 +1,7 @@
-
 import os
-
-import pandas as pd
 import requests
 import streamlit as st
+from PIL import Image
 
 def classify_image(image, backend):
     """Send the image to the backend for classification."""
@@ -15,32 +13,55 @@ def classify_image(image, backend):
 
 def main() -> None:
     """Main function of the Streamlit frontend."""
-    backend = "https://fruits-model-api-jelcai3tmq-ew.a.run.app"
+    # Set page title/icon (optional)
+    st.set_page_config(page_title="Fruits Classifier", page_icon="🍓")
+
+    # Define your backend URL
+    backend = "https://mlops-fruit-project-5pl7l76ovq-ew.a.run.app/"
     if backend is None:
-        msg = "Backend service not found"
-        raise ValueError(msg)
+        raise ValueError("Backend service not found")
 
-    st.title("Image Classification")
+    # Title and description
+    st.title("Fruit Image Classification 🍎🍌🥝")
+    st.write("This app uses a machine learning model to identify fruit in images. \
+              Simply upload a fruit image, and get the predicted fruit name along with confidence.")
 
-    uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+    # Use a side column (sidebar) for upload if you want
+    st.sidebar.title("Upload Image")
+    uploaded_file = st.sidebar.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
 
+    # If file is uploaded, proceed with classification
     if uploaded_file is not None:
-        image = uploaded_file.read()
-        result = classify_image(image, backend=backend)
-        print(result)
+        # Convert the uploaded file to bytes
+        image_bytes = uploaded_file.read()
+
+        # Optional: show the image in the main area using columns
+        col1, col2 = st.columns(2)
+        with col1:
+            # Show the uploaded image in the first column
+            st.image(image_bytes, caption="Uploaded Image", use_container_width=True)
+
+        # Classify the image
+        result = classify_image(image_bytes, backend=backend)
 
         if result is not None:
             prediction = result["predicted_class"]
-            confidence = result["confidence"]
+            confidence = float(result["confidence"])
 
-            # show the image and prediction
-            st.image(image, caption="Uploaded Image")
-            st.write("Prediction:", prediction)
-            st.write("Confidence:", f"{confidence * 100:.2f}%")
+            # Show results in the second column
+            with col2:
+                st.subheader("Classification Results")
+                st.write(f"**Prediction:** {prediction}")
+                
+                # Display confidence as a progress bar or as a metric
+                st.progress(confidence)  # progress bar with range [0..1]
+                st.metric(label="Confidence", value=f"{confidence * 100:.2f}%")
 
         else:
-            st.write("Failed to get prediction")
-
+            st.error("Failed to get a prediction from the backend.")
+    else:
+        # If no file is uploaded, show a placeholder message in the main section
+        st.info("Please upload an image to classify.")
 
 if __name__ == "__main__":
     main()
