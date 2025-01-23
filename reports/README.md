@@ -103,27 +103,27 @@ gcloud run deploy frontend \
 * [x] Write API tests for your application and setup continues integration for these (M24)
 * [-] Load test your application (M24)
 * [-] Create a more specialized ML-deployment API using either ONNX or BentoML, or both (M25)
-* [-] Create a frontend for your API (M26)
+* [x] Create a frontend for your API (M26)
 
 ### Week 3
 
-* [ ] Check how robust your model is towards data drifting (M27)
-* [ ] Deploy to the cloud a drift detection API (M27)
-* [ ] Instrument your API with a couple of system metrics (M28)
-* [ ] Setup cloud monitoring of your instrumented application (M28)
-* [ ] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
-* [ ] If applicable, optimize the performance of your data loading using distributed data loading (M29)
-* [ ] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
-* [ ] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
+* [x] Check how robust your model is towards data drifting (M27)
+* [-] Deploy to the cloud a drift detection API (M27)
+* [-] Instrument your API with a couple of system metrics (M28)
+* [-] Setup cloud monitoring of your instrumented application (M28)
+* [-] Create one or more alert systems in GCP to alert you if your app is not behaving correctly (M28)
+* [-] If applicable, optimize the performance of your data loading using distributed data loading (M29)
+* [-] If applicable, optimize the performance of your training pipeline by using distributed training (M30)
+* [-] Play around with quantization, compilation and pruning for you trained models to increase inference speed (M31)
 
 ### Extra
 
-* [ ] Write some documentation for your application (M32)
-* [ ] Publish the documentation to GitHub Pages (M32)
-* [ ] Revisit your initial project description. Did the project turn out as you wanted?
-* [ ] Create an architectural diagram over your MLOps pipeline
-* [ ] Make sure all group members have an understanding about all parts of the project
-* [ ] Uploaded all your code to GitHub
+* [-] Write some documentation for your application (M32)
+* [-] Publish the documentation to GitHub Pages (M32)
+* [-] Revisit your initial project description. Did the project turn out as you wanted?
+* [-] Create an architectural diagram over your MLOps pipeline
+* [x] Make sure all group members have an understanding about all parts of the project
+* [x] Uploaded all your code to GitHub
 
 ## Group information
 
@@ -391,7 +391,7 @@ By combining these GCP services, we achieved a scalable and efficient workflow.
 >
 > Answer:
 
---- question 18 fill here ---
+We tried to use the Compute Engine in GCP for the exercises, but realized that the process of creating and then running a Virtual Machine, then cloning your repository, then installing pip packages, download the data (our dataset is large) and finally run the code and then close the VM instance afterwards was slow and ineffective, so we instead used the Vertex AI service, which we will explain further later on. The Virtual Machines we used for training in Vertex AI was the type "n1-highmem-2". The compute engine can be useful for simple training with not a lot of experiments.
 
 ### Question 19
 
