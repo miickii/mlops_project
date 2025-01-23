@@ -1,5 +1,8 @@
 [core]
-    remote = storage
+    remote = remote_storage
 ['remote "storage"']
     url = gs://fruits_data
+    version_aware = true
+['remote "remote_storage"']
+    url = gs://fruits-mlops-data
     version_aware = true
