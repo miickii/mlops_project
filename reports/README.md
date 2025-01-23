@@ -410,15 +410,9 @@ By combining these GCP services, we achieved a scalable and efficient workflow.
 > **The backbone of GCP is the Compute engine. Explained how you made use of this service and what type of VMs**
 > **you used?**
 >
-> Recommended answer length: 100-200 words.
->
-> Example:
-> *We used the compute engine to run our ... . We used instances with the following hardware: ... and we started the*
-> *using a custom container: ...*
->
 > Answer:
 
---- question 18 fill here ---
+We tried to use the Compute Engine in GCP for the exercises, but realized that the process of creating and then running a Virtual Machine, then cloning your repository, then installing pip packages, download the data (our dataset is large) and finally run the code and then close the VM instance afterwards was slow and ineffective, so we instead used the Vertex AI service, which we will explain further later on. The Virtual Machines we used for training in Vertex AI was the type "n1-highmem-2". The compute engine can be useful for simple training with not a lot of experiments.
 
 ### Question 19
 
