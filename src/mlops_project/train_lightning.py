@@ -39,6 +39,7 @@ def train(
 
     # Initialize W&B Logger
     wandb_logger = WandbLogger(project=project_name, log_model=True, reinit=True)
+    wandb_logger.log_hyperparams({"epochs": epochs, "batch_size": batch_size, "lr": lr})
     print(f"Starting a new W&B run in project: {project_name}")
 
     # Initialize dataset and DataLoader
