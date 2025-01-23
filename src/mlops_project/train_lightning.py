@@ -24,9 +24,9 @@ app = typer.Typer()
 
 @app.command()
 def train(
-    epochs: int = 1,
+    epochs: int = 5,
     batch_size: int = 32,
-    lr: float = 1e-4,
+    lr: float = 1e-3,
     model_name: str = "fruits_model",
     project_name: str = "fruits_classification",
 ):
@@ -39,6 +39,7 @@ def train(
 
     # Initialize W&B Logger
     wandb_logger = WandbLogger(project=project_name, log_model=True, reinit=True)
+    wandb_logger.log_hyperparams({"epochs": epochs, "batch_size": batch_size, "lr": lr})
     print(f"Starting a new W&B run in project: {project_name}")
 
     # Initialize dataset and DataLoader
