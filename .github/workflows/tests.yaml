@@ -49,7 +49,7 @@ jobs:
     # Pull data using DVC
     # Set up DVC
     - name: Set up DVC
-      uses: iterative/setup-dvc@v1
+      uses: iterative/setup-dvc@v2
 
     # Pull data using DVC
     - name: Pull data
